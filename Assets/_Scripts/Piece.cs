@@ -1,37 +1,33 @@
 namespace YokAI
 {
+    /// <summary>
+    /// we identify pieces with their color and type : 
+    /// ccttt with c as color bit and t as type bit
+    /// </summary>
     public static class Piece
     {
-        
         public const int None = 0;
         public const int Pawn = 1;
         public const int Bishop = 2;
         public const int Rook = 3;
         public const int Gold = 4;
         public const int King = 5;
+
+        public const int White = 8;
+        public const int Black = 16;
     }
 
-    public static class Color
+    public static class Ban
     {
-        public const int White = 0;
-        public const int Black = 1;
-    }
+        public static int[] Grid;
+        public static int[] WhitePool;
+        public static int[] BlackPool;
 
-    public class Move
-    {
-        public const int INVALID_MOVE = 0;
-
-        public int MyTest()
+        static Ban()
         {
-            int[] grid = new int[12];
-            int next = 8;
-
-            int previous = 5;
-            int piece = grid[previous];
-
-            int move = previous | next | Color.White | piece;
-            return move;
+            Grid = new int[12];
+            WhitePool = new int[6];
+            BlackPool = new int[6];
         }
     }
-
 }
