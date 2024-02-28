@@ -6,28 +6,14 @@ namespace YokAI
     /// </summary>
     public static class Piece
     {
-        public const int None = 0;
-        public const int Pawn = 1;
-        public const int Bishop = 2;
-        public const int Rook = 3;
-        public const int Gold = 4;
-        public const int King = 5;
+        public const int NONE = 0;
+        public const int PAWN = 1;
+        public const int BISHOP = 2;
+        public const int ROOK = 3;
+        public const int GOLD = 4;
+        public const int KING = 5;
 
-        public const int White = 8;
-        public const int Black = 16;
-    }
-
-    public static class Ban
-    {
-        public static int[] Grid;
-        public static int[] WhitePool;
-        public static int[] BlackPool;
-
-        static Ban()
-        {
-            Grid = new int[12];
-            WhitePool = new int[6];
-            BlackPool = new int[6];
-        }
+        public const int WHITE = 8;
+        public const int BLACK = 16;
     }
 }
