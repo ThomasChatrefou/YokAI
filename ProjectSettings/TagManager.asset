@@ -41,3 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Ban
+    uniqueID: 2339084361
+    locked: 0
+  - name: Piece
+    uniqueID: 1109016899
+    locked: 0
