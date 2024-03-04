@@ -23,6 +23,10 @@ namespace YokAI
 
         public static int[] PiecesBitboards;
 
+        public static bool IsSet => PlayingColor == Piece.WHITE || PlayingColor == Piece.BLACK;
+
+        public static Move INVALID_MOVE = new(0, 0, 0);
+
         static Ban()
         {
             Reset();
@@ -33,6 +37,9 @@ namespace YokAI
             Grid = new int[Size];
             WhitePool = new int[PLAYERS * POOLABLES];
             BlackPool = new int[PLAYERS * POOLABLES];
+            PlayingColor = 0;
+            MoveNumber = 0;
+            LastMove = INVALID_MOVE;
             PiecesBitboards = new int[] { 0, 0 };
         }
 
@@ -87,6 +94,11 @@ namespace YokAI
             Grid[move.StartSquare] = Piece.NONE;
 
             LastMove = move;
+            PassTurn();
+        }
+
+        public static void PassTurn()
+        {
             if (PlayingColor == Piece.BLACK)
             {
                 ++MoveNumber;
@@ -110,6 +122,5 @@ namespace YokAI
         {
             return PiecesBitboards[(color >> 8) - 1];
         }
-
     }
 }

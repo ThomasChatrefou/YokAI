@@ -50,33 +50,55 @@ namespace YokAI
         public static void GetAvailableMoves(ref string cachedResult)
         {
             cachedResult = string.Empty;
-            MoveGenerator.GenerateMoves();
-            foreach (Move move in MoveGenerator.Moves)
+            if (Ban.IsSet)
             {
-                cachedResult += Decryptor.GetNotationFromMove(move);
-                cachedResult += "  ";
+                MoveGenerator.GenerateMoves();
+                foreach (Move move in MoveGenerator.Moves)
+                {
+                    cachedResult += Decryptor.GetNotationFromMove(move);
+                    cachedResult += "  ";
+                }
             }
         }
 
         public static bool SendUserInputMove(string inputNotation)
         {
-            Move inputMove = Decryptor.GetMoveFromNotation(inputNotation);
-            if (Ban.IsValid(inputMove))
+            if (Ban.IsSet)
             {
-                Ban.MakeMove(inputMove);
-                return true;
+                Move inputMove = Decryptor.GetMoveFromNotation(inputNotation);
+                if (Ban.IsSet && Ban.IsValid(inputMove))
+                {
+                    Ban.MakeMove(inputMove);
+                    return true;
+                }
             }
             return false;
         }
 
+        public static void PassTurn()
+        {
+            Ban.PassTurn();
+        }
+
+        public static void LoadSFEN(string sfen)
+        {
+            PositionLoader.LoadPositionFromSFEN(sfen);
+        }
+        
+        public static void SetupEmptyPosition()
+        {
+            Ban.Reset();
+        }
+        
         public static void SetupStartingPosition()
         {
             PositionLoader.LoadPositionFromSFEN(PositionLoader.STARTING_POSITION);
         }
 
-        public static void DrawBanInConsole()
+        public static void DrawBanInConsole(string source = null)
         {
-            string log = "[DEBUG] Draw Ban In Console\n";
+            string log = "[DEBUG] Draw\n";
+            if (source != null) log += " from " + source;
             DrawBanInDebugLog(ref log);
             Debug.Log(log);
         }
@@ -86,7 +108,7 @@ namespace YokAI
             for (int rank = Ban.RANKS - 1; rank >= 0; --rank)
             {
                 log += "     --------------\n";
-                log += $"{rank}" + (rank == 0 ? " " : "  ") + "|   ";
+                log += $"{rank + 1}  |   ";
                 for (int file = 0; file < Ban.FILES; ++file)
                 {
                     if (file > 0)

@@ -91,17 +91,21 @@ namespace YokAI
 
         public static Move GetMoveFromNotation(string notation)
         {
-            int piece = GetPieceFromSymbol(notation[0]);
+            if (notation.Length == 5)
+            {
+                int piece = GetPieceFromSymbol(notation[0]);
 
-            int startFile = notation[1] - ASCII_CODE_ALPHABET_START;
-            int startRank = int.Parse(notation[2].ToString()) - 1;
-            int startSquare = Ban.GetGridIndex(startFile, startRank);
+                int startFile = notation[1] - ASCII_CODE_ALPHABET_START;
+                int startRank = int.Parse(notation[2].ToString()) - 1;
+                int startSquare = Ban.GetGridIndex(startFile, startRank);
 
-            int targetFile = notation[3] - ASCII_CODE_ALPHABET_START;
-            int targetRank = int.Parse(notation[4].ToString()) - 1;
-            int targetSquare = Ban.GetGridIndex(targetFile, targetRank);
+                int targetFile = notation[3] - ASCII_CODE_ALPHABET_START;
+                int targetRank = int.Parse(notation[4].ToString()) - 1;
+                int targetSquare = Ban.GetGridIndex(targetFile, targetRank);
 
-            return new Move(piece, startSquare, targetSquare);
+                return new Move(piece, startSquare, targetSquare);
+            }
+            return Ban.INVALID_MOVE;
         }
     }
 }
