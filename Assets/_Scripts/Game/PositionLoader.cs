@@ -13,6 +13,7 @@ namespace YokAI
 
         public static void LoadPositionFromSFEN(string sfen)
         {
+            Ban.Reset();
             string[] splitedSfen = sfen.Split(" ");
 
             string ban = splitedSfen[0];
@@ -34,7 +35,11 @@ namespace YokAI
                     }
                     else
                     {
-                        Ban.Grid[rank * Ban.FILES + file] = Decrpytor.GetPieceFromSymbol(symbol);
+                        int gridIndex = Ban.GetGridIndex(file, rank);
+                        int piece = Decryptor.GetPieceFromSymbol(symbol);
+                        Ban.Grid[gridIndex] = piece;
+                        Ban.PiecesBitboards[(Piece.GetColor(piece) >> 8) - 1] |= 1 << gridIndex;
+
                         ++file;
                     }
                 }
@@ -47,7 +52,7 @@ namespace YokAI
                 int blackPoolIndex = 0;
                 foreach (char symbol in pools)
                 {
-                    int piece = Decrpytor.GetPieceFromSymbol(symbol);
+                    int piece = Decryptor.GetPieceFromSymbol(symbol);
                     if (char.IsUpper(symbol))
                     {
                         Ban.WhitePool[whitePoolIndex++] = piece;

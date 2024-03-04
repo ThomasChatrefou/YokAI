@@ -3,15 +3,14 @@ using UnityEngine;
 
 namespace YokAI
 {
-    public static class Decrpytor
+    public static class Decryptor
     {
-        public const int TYPE_FILTER = 7;
-        public const int COLOR_FILTER = 24;
+        public const int ASCII_CODE_ALPHABET_START = 97;
 
         public static Dictionary<char, int> PieceBySymbol;
         public static Dictionary<int, char> SymbolByPiece;
 
-        static Decrpytor()
+        static Decryptor()
         {
             PieceBySymbol = new Dictionary<char, int>()
             {
@@ -46,25 +45,63 @@ namespace YokAI
 
         public static char GetSymbolFromPiece(int piece)
         {
-            int type = piece & TYPE_FILTER;
+            int type = piece & Piece.TYPE_FILTER;
             if (!SymbolByPiece.TryGetValue(type, out char result))
             {
-                Debug.Log("Decrypting unkown piece type");
+                Debug.Log("Decrypting unknown piece type");
                 return '0';
             }
 
-            int color = piece & COLOR_FILTER;
+            int color = piece & Piece.COLOR_FILTER;
             if (color == Piece.WHITE)
             {
                 result = char.ToUpper(result);
             }
             else if (color != Piece.BLACK && piece != Piece.NONE)
             {
-                Debug.Log("Decrypting unkown piece color");
+                Debug.Log("Decrypting unknown piece color");
                 return '0';
             }
 
             return result;
+        }
+
+        public static string GetNotationFromMove(Move move)
+        {
+            if (move.Piece == Piece.NONE)
+            {
+                return "None";
+            }
+
+            char pieceSymbol = GetSymbolFromPiece(move.Piece);
+            Vector2Int startSquare = Ban.GetCoordinates(move.StartSquare);
+            Vector2Int targetSquare = Ban.GetCoordinates(move.TargetSquare);
+
+            char startFile = (char)(startSquare.x + ASCII_CODE_ALPHABET_START);
+            char targetFile = (char)(targetSquare.x + ASCII_CODE_ALPHABET_START);
+
+            string notation = string.Empty;
+            notation += pieceSymbol;
+            notation += startFile;
+            notation += $"{startSquare.y + 1}";
+            notation += targetFile;
+            notation += $"{targetSquare.y + 1}";
+            return notation;
+        }
+
+        public static Move GetMoveFromNotation(string notation)
+        {
+            int piece = GetPieceFromSymbol(notation[0]);
+
+            int startFile = notation[1] - ASCII_CODE_ALPHABET_START;
+            int startRank = int.Parse(notation[2].ToString()) - 1;
+            int startSquare = Ban.GetGridIndex(startFile, startRank);
+
+            int targetFile = notation[3] - ASCII_CODE_ALPHABET_START;
+            int targetRank = int.Parse(notation[4].ToString()) - 1;
+            int targetSquare = Ban.GetGridIndex(targetFile, targetRank);
+
+            return new Move(piece, startSquare, targetSquare);
         }
     }
 }
