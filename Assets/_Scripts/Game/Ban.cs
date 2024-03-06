@@ -52,6 +52,10 @@ namespace YokAI
         {
             return y * FILES + x;
         }
+        public static int GetGridIndex(Vector2Int vector)
+        {
+            return GetGridIndex(vector.x, vector.y);
+        }
 
         public static Vector2Int GetCoordinates(int index)
         {

@@ -8,31 +8,21 @@ using UnityEngine.Serialization;
 namespace YokAI
 {
     public class PieceMonobehaviour : MonoBehaviour
-    {
+    { 
         [SerializeField] private int pieceSize = 1;
-        [SerializeField] private bool IsPooled = false;
-        [SerializeField, ShowIf("IsPooled")] private PieceMonobehaviour pieceToSpawn;
-        [SerializeField] private Color indicatorColor;
-        
+
         private SpriteRenderer indicator;
         private Camera _camera;
         private bool _isGrabbed = false;
         private Vector3 originalPosition;
         private Coroutine followMouseCoroutine;
-        private bool _isSpawned;
 
-        private PieceMonobehaviour pieceSpawned;
+        private int pieceID;
 
-        public Vector3 OriginalPosition
+        public int PieceID
         {
-            get => originalPosition;
-            set => originalPosition = value;
-        }
-
-        public bool IsSpawned
-        {
-            get => _isSpawned;
-            set => _isSpawned = value;
+            get => pieceID;
+            set => pieceID = value;
         }
 
         private void Start()
@@ -41,27 +31,14 @@ namespace YokAI
             indicator = GameObject.FindWithTag("Indicator").GetComponent<SpriteRenderer>();
             
             originalPosition = transform.position;
-
-            if (_isSpawned)
-                OnMouseDown();
         }
 
         private void OnMouseDown()
         { 
-            //TODO: Link placement with actual board, and link pieces coming from pool with actual pool :D
-            
             _isGrabbed = true;
-            
-            if (IsPooled)
-            {
-                pieceSpawned = Instantiate(pieceToSpawn);
-                pieceSpawned.gameObject.GetComponent<Collider2D>().enabled = false;
-                pieceSpawned.IsSpawned = true;
-                return;
-            }
-            
             FlipFlopIndicator();
-             
+            
+            BanManager.instance.MoveIndicator(pieceID, true);
             followMouseCoroutine = StartCoroutine(FollowMouse());
         }
 
@@ -69,19 +46,15 @@ namespace YokAI
         {
             if (_isGrabbed)
             {
-                if (IsPooled)
-                { 
-                    pieceSpawned.OnMouseUp();
-                    pieceSpawned.gameObject.GetComponent<Collider2D>().enabled = true;
-                    return;
-                }
-                if (IsInBounds())
-                    originalPosition = GetNearestPos(transform.position);
+                Vector2 targetPos = GetNearestPos(transform.position);
+                if (IsInBounds() && BanManager.instance.CheckIfCanMake(pieceID, originalPosition, targetPos)) //check if move is legal and/or make move
+                    originalPosition = targetPos;
                 
                 StopCoroutine(followMouseCoroutine);
                 _isGrabbed = false;
                 transform.position = originalPosition;
                 FlipFlopIndicator();
+                BanManager.instance.MoveIndicator(pieceID, false);
             }
         }
 
@@ -125,6 +98,7 @@ namespace YokAI
 
         private void FlipFlopIndicator()
         {
+            Color indicatorColor = BanManager.instance.IndicatorColor;
             float alpha = indicator.color.a > 0 ? 0 : indicatorColor.a;
             
             indicator.color = new Color(indicatorColor.r, indicatorColor.g, indicatorColor.b, alpha);

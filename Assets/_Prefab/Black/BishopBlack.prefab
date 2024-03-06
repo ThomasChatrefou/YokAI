@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1707309185300353998, guid: a1c45c02f1faf2649ade8b85203e9389, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1707309185300353998, guid: a1c45c02f1faf2649ade8b85203e9389, type: 3}
       propertyPath: m_LocalRotation.x
@@ -34,7 +34,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1707309185300353998, guid: a1c45c02f1faf2649ade8b85203e9389, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1707309185300353998, guid: a1c45c02f1faf2649ade8b85203e9389, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -46,11 +46,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1707309185300353998, guid: a1c45c02f1faf2649ade8b85203e9389, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 180
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2014668106702222386, guid: a1c45c02f1faf2649ade8b85203e9389, type: 3}
       propertyPath: m_Name
-      value: BishopOpponent
+      value: BishopBlack
+      objectReference: {fileID: 0}
+    - target: {fileID: 3502446519022401608, guid: a1c45c02f1faf2649ade8b85203e9389, type: 3}
+      propertyPath: m_FlipX
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3502446519022401608, guid: a1c45c02f1faf2649ade8b85203e9389, type: 3}
+      propertyPath: m_FlipY
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
