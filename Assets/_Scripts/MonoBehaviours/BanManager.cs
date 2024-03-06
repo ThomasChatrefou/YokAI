@@ -1,26 +1,28 @@
 using System;
 using System.Collections.Generic;
-using _Scripts.Utilities;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace YokAI
 {
-    public class BanManager : Singleton<BanManager>
+    public class BanManager : _Scripts.Utilities.Singleton<BanManager>
     {
         [SerializeField] private Color indicatorColor;
         [SerializeField] private Color moveIndicatorColor;
         
         [SerializeField] private GameObject[] whitePawnBank;
         [SerializeField] private GameObject[] blackPawnBank;
-        [SerializeField] private GameObject[] moveIndicators;
+        [SerializeField] private Transform[] poolPositions;
+        [SerializeField] private SpriteRenderer[] moveIndicators;
 
         private Dictionary<int, PieceMonobehaviour> _pieces = new ();
+        private Dictionary<(int, int), Transform> pools = new ();
 
         public Color IndicatorColor => indicatorColor;
 
-        public static List<int> Pieces = new()
+        public static List<int> Pieces = new() // this is temporary
         {
             { Piece.NONE },
             { Piece.PAWN  },
@@ -44,6 +46,19 @@ namespace YokAI
                 piece.PieceID = Pieces[i + 1] | Piece.BLACK;
                 _pieces.Add(piece.PieceID, piece);
             }
+
+            for (int i = 0; i < 3; i++)
+            {
+                pools[(Pieces[i+1] | Piece.WHITE, Piece.WHITE)] = poolPositions[i   + 3*i];
+                pools[(Pieces[i+1] | Piece.BLACK, Piece.WHITE)] = poolPositions[i+1 + 3*i];
+                pools[(Pieces[i+1] | Piece.WHITE, Piece.BLACK)] = poolPositions[i+2 + 3*i];
+                pools[(Pieces[i+1] | Piece.BLACK, Piece.BLACK)] = poolPositions[i+3 + 3*i];
+            }
+
+            // foreach (var pos in pools)
+            // {
+            //     Debug.Log(Decryptor.GetSymbolFromPiece(pos.Key.Item1) + ", " + pos.Key.Item2 + " | " + pos.Value.position.ToString());
+            // }
 
             InitBoard(Ban.Grid);
         }
@@ -72,6 +87,22 @@ namespace YokAI
             if (Ban.IsSet && Ban.IsValid(inputMove))
             {
                 Ban.MakeMove(inputMove);
+
+                if (Ban.PlayingColor != Piece.WHITE)
+                {
+                    for (int i = 0; i < Ban.WhitePoolNextAvailableIndex; i++)
+                    {
+                        AddPieceToPool(Ban.WhitePool[i], Piece.WHITE);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < Ban.BlackPoolNextAvailableIndex; i++)
+                    {
+                        AddPieceToPool(Ban.BlackPool[i], Piece.BLACK);
+                    }
+                }
+                
                 return true;
             }
 
@@ -80,15 +111,39 @@ namespace YokAI
 
         public void MoveIndicator(int piece, bool toggle)
         {
+            if (!toggle)
+            {
+                foreach (var moveIndicator in moveIndicators)
+                {
+                    moveIndicator.color = Color.clear;
+                }
+                return;
+            }
+                
+            
             MoveGenerator.GenerateMoves();
 
             foreach (Move move in MoveGenerator.Moves)
             {
                 if (move.Piece == piece)
                 {
-                    moveIndicators[move.TargetSquare].GetComponent<SpriteRenderer>().color = toggle ? moveIndicatorColor : Color.clear;
+                    moveIndicators[move.TargetSquare].color = moveIndicatorColor ;
                 }
             }
+        }
+
+        private void AddPieceToPool(int piece, int poolColor)
+        {
+            Vector3 newPos = pools[(piece, poolColor)].position;
+            
+            _pieces[piece].transform.position = newPos;
+            _pieces[piece].OriginalPosition = newPos;
+
+            SpriteRenderer spriteRenderer = _pieces[piece].GetComponent<SpriteRenderer>();
+
+            spriteRenderer.flipX = !spriteRenderer.flipX;
+            spriteRenderer.flipY = !spriteRenderer.flipY;
+
         }
         
     }

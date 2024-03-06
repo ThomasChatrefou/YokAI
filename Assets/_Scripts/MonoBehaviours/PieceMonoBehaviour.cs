@@ -25,6 +25,12 @@ namespace YokAI
             set => pieceID = value;
         }
 
+        public Vector3 OriginalPosition
+        {
+            get => originalPosition;
+            set => originalPosition = value;
+        }
+
         private void Start()
         {
             _camera = Camera.main;
