@@ -8,17 +8,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1769805998943889988, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1769805998943889988, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1769805998943889988, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.5
+    - target: {fileID: 753007052862202729, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
+      propertyPath: IsPooled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1769805998943889988, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
       propertyPath: m_LocalPosition.x
@@ -60,13 +52,13 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1769805998943889988, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5677156005745108594, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
       propertyPath: m_Name
       value: RookReserve
+      objectReference: {fileID: 0}
+    - target: {fileID: 7228411790805670647, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
+      propertyPath: m_SortingOrder
+      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

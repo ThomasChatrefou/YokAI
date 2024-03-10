@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1769805998943889988, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1769805998943889988, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
       propertyPath: m_LocalRotation.x
@@ -34,7 +34,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1769805998943889988, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1769805998943889988, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -46,11 +46,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1769805998943889988, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 180
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5677156005745108594, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
       propertyPath: m_Name
-      value: RookOpponent
+      value: RookBlack
+      objectReference: {fileID: 0}
+    - target: {fileID: 7228411790805670647, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
+      propertyPath: m_FlipX
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7228411790805670647, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
+      propertyPath: m_FlipY
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

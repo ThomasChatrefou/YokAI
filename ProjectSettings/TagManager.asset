@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Indicator
   layers:
   - Default
   - TransparentFX
@@ -43,6 +44,12 @@ TagManager:
     locked: 0
   - name: Ban
     uniqueID: 2339084361
+    locked: 0
+  - name: MoveIndicator
+    uniqueID: 2443246513
+    locked: 0
+  - name: Indicator
+    uniqueID: 3344184583
     locked: 0
   - name: Piece
     uniqueID: 1109016899
