@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEditor;
-using YokAI;
+using YokAI.POC;
 
 public class YokAIDebugger : EditorWindow
 {

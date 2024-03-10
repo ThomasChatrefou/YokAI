@@ -5,7 +5,7 @@ using UnityEngine;
 /// 
 /// </summary>
 
-namespace YokAI
+namespace YokAI.POC
 {
     public static class PositionLoader
     {

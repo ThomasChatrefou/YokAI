@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace YokAI
+namespace YokAI.POC
 {
     public readonly struct Move
     {

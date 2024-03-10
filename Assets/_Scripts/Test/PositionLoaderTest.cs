@@ -1,7 +1,7 @@
 using NaughtyAttributes;
 using UnityEngine;
 
-namespace YokAI
+namespace YokAI.POC
 {
     namespace Test
     {

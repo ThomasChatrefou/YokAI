@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace YokAI
+namespace YokAI.POC
 {
     public static class Decryptor
     {

@@ -1,4 +1,4 @@
-namespace YokAI
+namespace YokAI.POC
 {
     /// <summary>
     /// we identify pieces with their color and type : 

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace YokAI
+namespace YokAI.POC
 {
     public static class BanDebugger
     {
