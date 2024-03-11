@@ -58,12 +58,22 @@ namespace YokAI.Main
                     uint mobility = Mobility.Get(currentPiece);
                     byte startCellId = Location.Get(currentPiece);
                     uint geography = Geography.Get(startCellId);
+                    uint constrainedMobility = Bitboard.Filter(mobility, by: geography);
 
                     uint occupiedCells = _occupationBitboards[PlayingColor - 1];
-                    Bitboard.Combine(ref occupiedCells, with: mobility == Mobility.DROP ? _occupationBitboards[Color.GetOpponent(PlayingColor) - 1] : 0u);
-                    Bitboard.AlignWithMobilityAtLocation(ref occupiedCells, startCellId);
 
-                    uint reachableCells = Bitboard.FindReachableCells(occupiedCells, mobility & geography);
+                    uint reachableCells;
+                    if (mobility == Mobility.DROP)
+                    {
+                        Bitboard.Combine(ref occupiedCells, with: _occupationBitboards[Color.GetOpponent(PlayingColor) - 1]);
+                        reachableCells = Bitboard.FindReachableCells(occupiedCells, constrainedMobility);
+                    }
+                    else
+                    {
+                        Bitboard.AlignWithMobilityAtLocation(ref occupiedCells, startCellId);
+                        reachableCells = Bitboard.FindReachableCells(occupiedCells, constrainedMobility);
+                        Bitboard.AlignBackWithGrid(ref reachableCells, startCellId);
+                    }
 
                     for (byte targetCellId = 0; targetCellId < Grid.SIZE; ++targetCellId)
                     {
@@ -152,6 +162,13 @@ namespace YokAI.Main
         {
             PlayingColor = Color.GetOpponent(PlayingColor);
         }
+
+        public uint[] GetLastMoveGeneration()
+        {
+            uint[] result = new uint[_generatedMovesCount];
+            System.Array.Copy(_generatedMoves, result, _generatedMovesCount);
+            return result;
+        }
     }
 
     public class Grid
@@ -196,15 +213,15 @@ namespace YokAI.Main
             return ref Cells[cellId];
         }
 
-        public static int GetIndex(int x, int y)
+        public static byte GetCellId(int x, int y)
         {
-            return y * FILES + x;
+            return (byte)(y * FILES + x);
         }
 
-        public static void GetCoordinates(int index, out int x, out int y)
+        public static void GetCoordinates(byte cellId, out int x, out int y)
         {
-            x = index % FILES;
-            y = index / FILES;
+            x = cellId % FILES;
+            y = cellId / FILES;
         }
 
         private static uint _invalidCell;

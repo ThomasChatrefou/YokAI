@@ -33,6 +33,12 @@ namespace YokAI.GridProperties
             bitboard >>= cellId;
         }
 
+        public static void AlignBackWithGrid(ref uint bitboard, byte cellId)
+        {
+            bitboard <<= cellId;
+            bitboard >>= 4;
+        }
+
         public static uint FindReachableCells(uint bitboard, uint constraint)
         {
             return (constraint | bitboard) ^ bitboard;
@@ -43,17 +49,17 @@ namespace YokAI.GridProperties
             bitboard |= with;
         }
 
+        public static uint Filter(uint bitboard, uint by)
+        {
+            return bitboard & by;
+        }
+
         public static uint CreateSingle(byte cellId)
         {
             return 1u << cellId;
         }
 
         /* // Could be useful ?
-        public static uint Filter(uint bitboard, uint filter)
-        {
-            return bitboard & filter;
-        }
-
         public static uint Add(uint bitboard, uint other)
         {
             return bitboard ^ other;
@@ -104,13 +110,13 @@ namespace YokAI.GridProperties
                 0xfff,   // Middle : 111 111 111 111
                 0x0db,   // East   : 000 011 011 011
                 0x1b6    // West   : 000 110 110 110
-            };
+        };
         public static readonly uint[] NORTH_SOUTH_CONSTRAINTS =
         {
                 0xfff,   // Middle : 111 111 111 111
                 0x03f,   // North  : 000 000 111 111
                 0x1f8    // South  : 000 111 111 000
-            };
+        };
 
         // 12 groups of 4 bits indicating positions on the board with respect to the edge. It is used as follows :
         // yyxx with xx the index in EAST_WEST_CONSTRAINTS and yy the index in NORTH_SOUTH_CONSTRAINTS

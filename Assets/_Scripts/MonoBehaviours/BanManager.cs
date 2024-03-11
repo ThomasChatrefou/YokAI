@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Serialization;
+using YokAI.POC;
 
 namespace YokAI
 {

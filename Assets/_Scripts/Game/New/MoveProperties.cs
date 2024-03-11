@@ -2,6 +2,8 @@ namespace YokAI.MoveProperties
 {
     public static class Move
     {
+        public const uint INVALID = uint.MaxValue;
+
         public static uint Create(byte movingPieceId, byte capturedPieceId, byte startCellId, byte targetCellId, bool isDrop, bool hasPromoted, bool hasUnpromoted)
         {
             uint move = 0u;

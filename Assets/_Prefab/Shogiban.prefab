@@ -483,6 +483,7 @@ GameObject:
   - component: {fileID: 5001515158860103180}
   - component: {fileID: 2175970307561715544}
   - component: {fileID: 822880556151349838}
+  - component: {fileID: -3399843720698999408}
   m_Layer: 0
   m_Name: Shogiban
   m_TagString: Untagged
@@ -568,7 +569,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2333461432729895667}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f7ff01cef92e40199c1e0ec87c2f7d4b, type: 3}
   m_Name: 
@@ -582,6 +583,58 @@ MonoBehaviour:
   - {fileID: 63800087063768698, guid: 05206dee92f701647a37270dce732b10, type: 3}
   - {fileID: 3469491897749793412, guid: 6177906f29314424a9ab58d67b9f37e4, type: 3}
   blackPawnBank:
+  - {fileID: 4007366377775417611, guid: b8a4abddba52a514a830d2b2dc597c32, type: 3}
+  - {fileID: 3639453872622810493, guid: 9fa7d9838855a2a49a2b2d3bcf904236, type: 3}
+  - {fileID: 8674366411045230514, guid: 1996adc6f0876f842be024e6203b951e, type: 3}
+  - {fileID: 4398180881606945908, guid: 6df328b992bcc3e4b89099e04c3b7561, type: 3}
+  - {fileID: 136718506394807955, guid: 651ec83fb0fb91842be9a1b2e1f527d4, type: 3}
+  poolPositions:
+  - {fileID: 7071001712425206319}
+  - {fileID: 3024447113298593866}
+  - {fileID: 1212837183941455714}
+  - {fileID: 2677755446700485532}
+  - {fileID: 6074592749420042779}
+  - {fileID: 5573161171643911101}
+  - {fileID: 8071977410029945046}
+  - {fileID: 7109267461854223140}
+  - {fileID: 823633081227703507}
+  - {fileID: 1650083941963188345}
+  - {fileID: 4581551615559963470}
+  - {fileID: 7160252848659017921}
+  moveIndicators:
+  - {fileID: 5186277976380195165}
+  - {fileID: 2629660904309528660}
+  - {fileID: 1580349565767566910}
+  - {fileID: 1770248013999508619}
+  - {fileID: 5561442553934184783}
+  - {fileID: 8306855302061228168}
+  - {fileID: 5646551519126257772}
+  - {fileID: 752878341927476719}
+  - {fileID: 8865522281488914425}
+  - {fileID: 646264747513096623}
+  - {fileID: 2560359558338229853}
+  - {fileID: 7502697460449592426}
+--- !u!114 &-3399843720698999408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2333461432729895667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3cb3fff9f452f4c87d4b647bdd4f6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  indicatorColor: {r: 0.80784315, g: 0.8509804, b: 0.25882354, a: 0.3529412}
+  moveIndicatorColor: {r: 0, g: 0.36078432, b: 0.30980393, a: 0.627451}
+  whitePiecesBank:
+  - {fileID: 6772730499767437265, guid: c3fe66a593e88f64f8e87261faa96422, type: 3}
+  - {fileID: 2014668106702222386, guid: a1c45c02f1faf2649ade8b85203e9389, type: 3}
+  - {fileID: 5677156005745108594, guid: 3fdd7fc7698f8bb4493af6c52915c281, type: 3}
+  - {fileID: 63800087063768698, guid: 05206dee92f701647a37270dce732b10, type: 3}
+  - {fileID: 3469491897749793412, guid: 6177906f29314424a9ab58d67b9f37e4, type: 3}
+  blackPiecesBank:
   - {fileID: 4007366377775417611, guid: b8a4abddba52a514a830d2b2dc597c32, type: 3}
   - {fileID: 3639453872622810493, guid: 9fa7d9838855a2a49a2b2d3bcf904236, type: 3}
   - {fileID: 8674366411045230514, guid: 1996adc6f0876f842be024e6203b951e, type: 3}
