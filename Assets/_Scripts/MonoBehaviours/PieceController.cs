@@ -1,12 +1,15 @@
 using System.Collections;
 using UnityEngine;
+using PColor = YokAI.PieceProperties.Color;
 
 namespace YokAI
 {
     public class PieceController : MonoBehaviour
     {
         [SerializeField] private int pieceSize = 1;
+        [SerializeField] private Sprite promotionSprite;
 
+        private Sprite originalSprite;
         private SpriteRenderer indicator;
         private Camera _camera;
         private bool _isGrabbed = false;
@@ -31,6 +34,8 @@ namespace YokAI
         {
             _camera = Camera.main;
             indicator = GameObject.FindWithTag("Indicator").GetComponent<SpriteRenderer>();
+
+            originalSprite = GetComponent<SpriteRenderer>().sprite;
 
             originalPosition = transform.position;
         }
@@ -104,6 +109,21 @@ namespace YokAI
             float alpha = indicator.color.a > 0 ? 0 : indicatorColor.a;
 
             indicator.color = new Color(indicatorColor.r, indicatorColor.g, indicatorColor.b, alpha);
+        }
+
+        public void ChangeColor(bool isWhite)
+        {
+            GetComponent<SpriteRenderer>().material.SetInt("_IsWhite", isWhite?1:0);
+        }
+
+        public void ChangePromotionPawn(bool isPromoted)
+        {
+            GetComponent<SpriteRenderer>().sprite = isPromoted ? promotionSprite : originalSprite;
+        }
+
+        public void SetCheckPiece(bool isCheck)
+        {
+            GetComponent<SpriteRenderer>().material.SetInt("_Check", isCheck?1:0);
         }
     }
 }

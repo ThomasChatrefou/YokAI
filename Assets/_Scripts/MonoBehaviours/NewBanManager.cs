@@ -22,7 +22,7 @@ namespace YokAI
         [SerializeField] private SpriteRenderer[] moveIndicators;
 
         private Dictionary<byte, PieceController> _pieces = new();
-        private Dictionary<(uint, uint), Transform> pools = new();
+        private Dictionary<(byte, uint), Transform> pools = new();
 
         public UnityEngine.Color IndicatorColor => indicatorColor;
 
@@ -34,25 +34,20 @@ namespace YokAI
             for (byte pieceId = 0; pieceId < GameController.Ban.PieceSet.Size; pieceId++)
             {
                 uint pieceType = Type.Get(pieceSet[pieceId]);
+                uint pieceColor = PColor.Get(pieceSet[pieceId]);
                 GameObject go = (PColor.Get(pieceSet[pieceId]) == PColor.WHITE) ? whitePiecesBank[pieceType - 1] : blackPiecesBank[pieceType - 1];
                 PieceController pieceController = Instantiate(go, Vector3.up * 10, quaternion.identity, transform).GetComponent<PieceController>();
                 pieceController.PieceID = pieceId;
+                pieceController.ChangeColor(pieceColor == PColor.WHITE);
                 _pieces.Add(pieceId, pieceController);
+                
+                if (pieceType == Type.PAWN || pieceType == Type.BISHOP || pieceType == Type.ROOK)
+                {
+                    
+                    pools[(pieceId, PColor.WHITE)] = poolPositions[pieceType - 1 + pieceColor - 1];
+                    pools[(pieceId, PColor.BLACK)] = poolPositions[pieceType - 1 + pieceColor - 1 + 6];
+                }
             }
-
-            for (int i = 0; i < 3; i++)
-            {
-                uint type = (uint)(i + 1);
-                pools[(Piece.Create(PColor.WHITE, type), PColor.WHITE)] = poolPositions[i + 3 * i];
-                pools[(Piece.Create(PColor.BLACK, type), PColor.WHITE)] = poolPositions[i + 1 + 3 * i];
-                pools[(Piece.Create(PColor.WHITE, type), PColor.BLACK)] = poolPositions[i + 2 + 3 * i];
-                pools[(Piece.Create(PColor.BLACK, type), PColor.BLACK)] = poolPositions[i + 3 + 3 * i];
-            }
-
-            // foreach (var pos in pools)
-            // {
-            //     Debug.Log(Decryptor.GetSymbolFromPiece(pos.Key.Item1) + ", " + pos.Key.Item2 + " | " + pos.Value.position.ToString());
-            // }
 
             InitBoard();
         }
@@ -86,10 +81,21 @@ namespace YokAI
             if (GameController.IsGameSet && GameController.TryMakeMove(inputMove))
             {
                 byte capturedPieceId = CapturedPiece.Get(inputMove);
+
+                if (Promote.Get(inputMove))
+                {
+                    _pieces[pieceId].ChangePromotionPawn(true);
+                }
+                if (Unpromote.Get(inputMove))
+                {
+                    _pieces[capturedPieceId].ChangePromotionPawn(false);
+                }
+                
                 if (capturedPieceId != PieceSet.INVALID_PIECE_ID)
                 {
                     AddPieceToPool(capturedPieceId, PColor.Get(GameController.Ban.PieceSet[capturedPieceId]));
                 }
+                
                 return true;
             }
             return false;
@@ -117,9 +123,7 @@ namespace YokAI
 
         private void AddPieceToPool(byte pieceId, uint poolColor)
         {
-            uint piece = GameController.Ban.PieceSet[pieceId];
-
-            Vector3 newPos = pools[(Piece.Create(PColor.Get(piece), Type.Get(piece)), poolColor)].position;
+            Vector3 newPos = pools[(pieceId, poolColor)].position;
 
             _pieces[pieceId].transform.position = newPos;
             _pieces[pieceId].OriginalPosition = newPos;
@@ -128,6 +132,8 @@ namespace YokAI
 
             spriteRenderer.flipX = !spriteRenderer.flipX;
             spriteRenderer.flipY = !spriteRenderer.flipY;
+            
+            _pieces[pieceId].ChangeColor(poolColor == PColor.WHITE);
         }
     }
 }
