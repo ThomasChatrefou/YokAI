@@ -39,13 +39,12 @@ namespace YokAI.Main
 
         public static uint CreateMove(byte movingPieceId, int startCoordX, int startCoordY, int targetCoordX, int targetCoordY)
         {
-            byte startCellId = Grid.GetCellId(startCoordX, startCoordY);
-            byte targetCellId = Grid.GetCellId(targetCoordX, targetCoordY);
-
-            byte capturedPieceId = Occupation.Get(Ban.Grid[targetCellId]);
-
             uint movingPiece = Ban.PieceSet[movingPieceId];
             bool isDrop = Location.Get(movingPiece) == Location.NONE;
+
+            byte startCellId = isDrop ? Grid.INVALID_CELL_ID : Grid.GetCellId(startCoordX, startCoordY);
+            byte targetCellId = Grid.GetCellId(targetCoordX, targetCoordY);
+            byte capturedPieceId = Occupation.Get(Ban.Grid[targetCellId]);
 
             uint move = Move.Create(movingPieceId, capturedPieceId, startCellId, targetCellId, isDrop
                 , hasPromoted: Type.Get(movingPiece) == Type.PAWN && PlayingColor == PromotionZone.Get(targetCellId) && !isDrop
