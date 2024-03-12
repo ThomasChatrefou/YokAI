@@ -21,6 +21,9 @@ namespace YokAI
         [SerializeField] private Transform[] poolPositions;
         [SerializeField] private SpriteRenderer[] moveIndicators;
 
+        [SerializeField] public UColor WhiteColor;
+        [SerializeField] public UColor BlackColor;
+        
         private Dictionary<byte, PieceController> _pieces = new();
         private Dictionary<(byte, uint), Transform> pools = new();
 

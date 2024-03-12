@@ -643,14 +643,14 @@ MonoBehaviour:
   poolPositions:
   - {fileID: 7071001712425206319}
   - {fileID: 3024447113298593866}
-  - {fileID: 1212837183941455714}
-  - {fileID: 2677755446700485532}
   - {fileID: 6074592749420042779}
   - {fileID: 5573161171643911101}
-  - {fileID: 8071977410029945046}
-  - {fileID: 7109267461854223140}
   - {fileID: 823633081227703507}
   - {fileID: 1650083941963188345}
+  - {fileID: 1212837183941455714}
+  - {fileID: 2677755446700485532}
+  - {fileID: 8071977410029945046}
+  - {fileID: 7109267461854223140}
   - {fileID: 4581551615559963470}
   - {fileID: 7160252848659017921}
   moveIndicators:
@@ -666,6 +666,8 @@ MonoBehaviour:
   - {fileID: 646264747513096623}
   - {fileID: 2560359558338229853}
   - {fileID: 7502697460449592426}
+  WhiteColor: {r: 0.81960785, g: 0.3529412, b: 0.24313726, a: 1}
+  BlackColor: {r: 0.27058825, g: 0.29411766, b: 0.8862745, a: 1}
 --- !u!1 &2441570932812270821
 GameObject:
   m_ObjectHideFlags: 0
@@ -1617,7 +1619,7 @@ Transform:
   m_GameObject: {fileID: 7509408917668555614}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.45, y: -1.95, z: -0.02124734}
+  m_LocalPosition: {x: -3.45, y: -1.7, z: -0.02124734}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

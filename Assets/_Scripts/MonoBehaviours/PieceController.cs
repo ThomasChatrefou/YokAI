@@ -36,6 +36,8 @@ namespace YokAI
             indicator = GameObject.FindWithTag("Indicator").GetComponent<SpriteRenderer>();
 
             originalSprite = GetComponent<SpriteRenderer>().sprite;
+            GetComponent<SpriteRenderer>().sharedMaterial.SetColor("_WhiteColor", NewBanManager.instance.WhiteColor);
+            GetComponent<SpriteRenderer>().sharedMaterial.SetColor("_BlackColor", NewBanManager.instance.BlackColor);
 
             originalPosition = transform.position;
         }
