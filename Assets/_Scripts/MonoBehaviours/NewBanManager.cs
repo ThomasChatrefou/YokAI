@@ -47,8 +47,8 @@ namespace YokAI
                 if (pieceType == Type.PAWN || pieceType == Type.BISHOP || pieceType == Type.ROOK)
                 {
                     
-                    pools[(pieceId, PColor.WHITE)] = poolPositions[pieceType - 1 + pieceColor - 1];
-                    pools[(pieceId, PColor.BLACK)] = poolPositions[pieceType - 1 + pieceColor - 1 + 6];
+                    pools[(pieceId, PColor.WHITE)] = poolPositions[(pieceType - 1)*2 + pieceColor - 1];
+                    pools[(pieceId, PColor.BLACK)] = poolPositions[(pieceType - 1)*2 + pieceColor - 1 + 6];
                 }
             }
 
