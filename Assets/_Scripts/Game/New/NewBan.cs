@@ -11,10 +11,14 @@ namespace YokAI.Main
         public PieceSet PieceSet { get; private set; }
         public Grid Grid { get; private set; }
         public uint PlayingColor { get; private set; }
+        public uint OpponentColor { get { return Color.GetOpponent(PlayingColor); } }
+        public byte[] KingIds { get { return _kingIds; } }
 
         private uint[] _occupationBitboards;
         private uint[] _generatedMoves;
         private int _generatedMovesCount;
+
+        private byte[] _kingIds;
 
         public Ban()
         {
@@ -31,6 +35,7 @@ namespace YokAI.Main
 
             _occupationBitboards = new uint[] { 0, 0 };
             _generatedMovesCount = 0;
+            _kingIds = new byte[2] { PieceSet.INVALID_PIECE_ID, PieceSet.INVALID_PIECE_ID };
         }
 
         public void Setup(PieceSet pieceSet, uint playingColor)
@@ -40,52 +45,162 @@ namespace YokAI.Main
             {
                 uint currentPiece = PieceSet[pieceId];
                 byte cellId = Location.Get(currentPiece);
-                Grid[cellId] = pieceId;
-                Bitboard.Combine(ref _occupationBitboards[Color.Get(currentPiece) - 1], Bitboard.CreateSingle(cellId));
+                uint color = Color.Get(currentPiece);
+                Occupation.Set(ref Grid.GetCellRef(cellId), pieceId);
+                Bitboard.Combine(ref _occupationBitboards[color - 1], Bitboard.CreateSingle(cellId));
+                if (Type.Get(currentPiece) == Type.KING)
+                {
+                    _kingIds[color - 1] = pieceId;
+                }
             }
             PlayingColor = playingColor;
+            UpdateControl();
             _generatedMovesCount = 0;
+        }
+
+        public bool IsInCheck(out bool isMultiple)
+        {
+            byte kingId = _kingIds[PlayingColor - 1];
+            byte kingCellId = Location.Get(PieceSet[kingId]);
+            byte checkingPieceId = Control.Get(Grid[kingCellId], OpponentColor);
+            isMultiple = checkingPieceId == Control.MULTIPLE;
+            return checkingPieceId != Control.NONE;
+        }
+
+        public bool IsOpponentKingOnPromotionZone()
+        {
+            byte opponentKingId = _kingIds[OpponentColor - 1];
+            byte kingCellId = Location.Get(PieceSet[opponentKingId]);
+            return PromotionZone.Get(kingCellId) == OpponentColor;
         }
 
         public void GenerateMoves()
         {
             _generatedMovesCount = 0;
+
+            if (IsInCheck(out bool isMultiple))
+            {
+                byte kingId = _kingIds[PlayingColor - 1];
+                GeneratePieceMoves(ref kingId, ref PieceSet.GetRef(kingId));
+
+                if (isMultiple) return;
+
+                for (byte pieceId = 0; pieceId < PieceSet.Size; pieceId++)
+                {
+                    if (pieceId == kingId) continue;
+
+                    uint currentPiece = PieceSet[pieceId];
+                    if (Color.Get(currentPiece) != PlayingColor) continue;
+                    
+                    ComputePieceReachableCells(out byte startCellId, out uint mobility, out uint reachableCells, ref currentPiece, PlayingColor);
+
+                    byte kingCellId = Location.Get(PieceSet[kingId]);
+                    byte checkingPieceId = Control.Get(Grid[kingCellId], OpponentColor);
+                    byte checkingPieceCellId = Location.Get(PieceSet[checkingPieceId]);
+
+                    if (Bitboard.Contains(reachableCells, checkingPieceCellId))
+                    {
+                        GenerateMove(pieceId, startCellId, checkingPieceCellId, mobility);
+                    }
+                }
+            }
+            else
+            {
+                for (byte pieceId = 0; pieceId < PieceSet.Size; pieceId++)
+                {
+                    uint currentPiece = PieceSet[pieceId];
+                    if (Color.Get(currentPiece) == PlayingColor)
+                    {
+                        GeneratePieceMoves(ref pieceId, ref currentPiece);
+                    }
+                }
+            }
+        }
+
+        public void GeneratePieceMoves(ref byte pieceId, ref uint movingPiece)
+        {
+            ComputePieceReachableCells(out byte startCellId, out uint mobility, out uint reachableCells, ref movingPiece, PlayingColor);
+
+            for (byte targetCellId = 0; targetCellId < Grid.SIZE; ++targetCellId)
+            {
+                if (Bitboard.Contains(reachableCells, targetCellId))
+                {
+                    if (Type.Get(movingPiece) == Type.CHAD && Control.Get(Grid[targetCellId], OpponentColor) != Control.NONE)
+                        continue;
+
+                    GenerateMove(pieceId, startCellId, targetCellId, mobility);
+                }
+            }
+        }
+
+        public void ComputePieceReachableCells(out byte startCellId, out uint mobility, out uint reachableCells, ref uint movingPiece, uint currentColor, bool useOccupation = true, bool noDrop = false)
+        {
+            startCellId = Location.Get(movingPiece);
+            mobility = Mobility.Get(movingPiece);
+
+            uint geography = Geography.Get(startCellId);
+            uint constrainedMobility = Bitboard.Filter(mobility, by: geography);
+
+            uint occupiedCells = useOccupation ? _occupationBitboards[currentColor - 1] : 0u;
+
+            if (mobility == Mobility.DROP)
+            {
+                if (noDrop)
+                {
+                    reachableCells = 0;
+                    return;
+                }
+
+                Bitboard.Combine(ref occupiedCells, with: _occupationBitboards[Color.GetOpponent(currentColor) - 1]);
+                reachableCells = Bitboard.FindReachableCells(occupiedCells, constrainedMobility);
+            }
+            else
+            {
+                Bitboard.AlignWithMobilityAtLocation(ref occupiedCells, startCellId);
+                reachableCells = Bitboard.FindReachableCells(occupiedCells, constrainedMobility);
+                Bitboard.AlignBackWithGrid(ref reachableCells, startCellId);
+            }
+        }
+
+        public void GenerateMove(byte movingPieceId, byte startCellId, byte targetCellId, uint mobility)
+        {
+            byte capturedPieceId = Occupation.Get(Grid[targetCellId]);
+            uint move = Move.Create(movingPieceId, capturedPieceId, startCellId, targetCellId
+                , isDrop: mobility == Mobility.DROP
+                , hasPromoted: Type.Get(PieceSet[movingPieceId]) == Type.PAWN && PlayingColor == PromotionZone.Get(targetCellId) && mobility != Mobility.DROP
+                , hasUnpromoted: Type.Get(PieceSet[capturedPieceId]) == Type.GOLD);
+
+            _generatedMoves[_generatedMovesCount++] = move;
+        }
+
+        public void UpdateControl()
+        {
+            for (byte targetCellId = 0; targetCellId < Grid.SIZE; ++targetCellId)
+            {
+                Control.Set(ref Grid.GetCellRef(targetCellId), Control.NONE, PlayingColor);
+                Control.Set(ref Grid.GetCellRef(targetCellId), Control.NONE, OpponentColor);
+            }
+
             for (byte pieceId = 0; pieceId < PieceSet.Size; pieceId++)
             {
                 uint currentPiece = PieceSet[pieceId];
-                if (Color.Get(currentPiece) == PlayingColor)
+                uint currentColor = Color.Get(currentPiece);
+
+                ComputePieceReachableCells(out byte _, out uint _, out uint reachableCells, ref currentPiece, currentColor, useOccupation: false, noDrop: true);
+
+                for (byte targetCellId = 0; targetCellId < Grid.SIZE; ++targetCellId)
                 {
-                    uint mobility = Mobility.Get(currentPiece);
-                    byte startCellId = Location.Get(currentPiece);
-                    uint geography = Geography.Get(startCellId);
-                    uint constrainedMobility = Bitboard.Filter(mobility, by: geography);
+                    byte controllingPieceId = Control.Get(Grid[targetCellId], currentColor);
 
-                    uint occupiedCells = _occupationBitboards[PlayingColor - 1];
-
-                    uint reachableCells;
-                    if (mobility == Mobility.DROP)
+                    if (Bitboard.Contains(reachableCells, targetCellId))
                     {
-                        Bitboard.Combine(ref occupiedCells, with: _occupationBitboards[Color.GetOpponent(PlayingColor) - 1]);
-                        reachableCells = Bitboard.FindReachableCells(occupiedCells, constrainedMobility);
-                    }
-                    else
-                    {
-                        Bitboard.AlignWithMobilityAtLocation(ref occupiedCells, startCellId);
-                        reachableCells = Bitboard.FindReachableCells(occupiedCells, constrainedMobility);
-                        Bitboard.AlignBackWithGrid(ref reachableCells, startCellId);
-                    }
-
-                    for (byte targetCellId = 0; targetCellId < Grid.SIZE; ++targetCellId)
-                    {
-                        if (Bitboard.Contains(reachableCells, targetCellId))
+                        if (controllingPieceId == Control.NONE)
                         {
-                            byte capturedPieceId = Occupation.Get(Grid[targetCellId]);
-                            uint move = Move.Create(pieceId, capturedPieceId, startCellId, targetCellId
-                                , isDrop: mobility == Mobility.DROP
-                                , hasPromoted: Type.Get(currentPiece) == Type.PAWN && PlayingColor == PromotionZone.Get(targetCellId) && mobility != Mobility.DROP
-                                , hasUnpromoted: Type.Get(PieceSet[capturedPieceId]) == Type.GOLD);
-
-                            _generatedMoves[_generatedMovesCount++] = move;
+                            Control.Set(ref Grid.GetCellRef(targetCellId), pieceId, currentColor);
+                        }
+                        else if (controllingPieceId != Control.MULTIPLE)
+                        {
+                            Control.Set(ref Grid.GetCellRef(targetCellId), Control.MULTIPLE, currentColor);
                         }
                     }
                 }
@@ -121,7 +236,8 @@ namespace YokAI.Main
             Mobility.Set(ref capturedPiece, Mobility.DROP);
 
             Bitboard.Capture(ref opponentOccupationBitboard, startCellId, targetCellId);
-
+            
+            UpdateControl();
             Pass();
         }
 
@@ -155,6 +271,7 @@ namespace YokAI.Main
 
             Bitboard.Uncapture(ref opponentOccupationBitboard, startCellId, targetCellId);
 
+            UpdateControl();
             Pass();
         }
 
@@ -198,7 +315,7 @@ namespace YokAI.Main
         {
             get
             {
-                if (cellId == INVALID_CELL_ID) return Cell.EMPTY;
+                if (cellId == INVALID_CELL_ID) return Cell.INVALID;
                 return Cells[cellId];
             }
             set

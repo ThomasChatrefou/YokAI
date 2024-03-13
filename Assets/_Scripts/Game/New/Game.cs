@@ -11,6 +11,7 @@ namespace YokAI.Main
 
         public static Ban Ban;
         public static uint PlayingColor { get { return Ban.PlayingColor; } }
+        public static uint OpponentColor { get { return Ban.OpponentColor; } }
 
         public static int MoveNumber { get { return _moveNumber; } }
         public static uint LastMove { get; private set; }
@@ -30,6 +31,11 @@ namespace YokAI.Main
         }
 
         public static bool IsGameSet { get; private set; }
+        public static bool IsInCheck { get { return Ban.IsInCheck(out bool _); } }
+
+        public static bool IsMate { get { return (IsInCheck && AvailableMoves.Length == 0) || Ban.IsOpponentKingOnPromotionZone(); } }
+
+        public static byte[] KingIds { get { return Ban.KingIds; } }
 
         static GameController()
         {
@@ -242,7 +248,7 @@ namespace YokAI.Main
                 {
                     byte cellId = Grid.GetCellId(file, rank);
                     uint cell = ban.Grid[cellId];
-                    if (cell == Cell.EMPTY)
+                    if (Occupation.Get(cell) == Occupation.NONE)
                     {
                         ++emptyCellsCount;
                     }

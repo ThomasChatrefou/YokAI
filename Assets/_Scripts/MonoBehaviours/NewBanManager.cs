@@ -8,6 +8,8 @@ using YokAI.MoveProperties;
 using UColor = UnityEngine.Color;
 using PColor = YokAI.PieceProperties.Color;
 using YGrid = YokAI.Main.Grid;
+using Unity.VisualScripting;
+using NaughtyAttributes;
 
 namespace YokAI
 {
@@ -28,6 +30,14 @@ namespace YokAI
         private Dictionary<(byte, uint), Transform> pools = new();
 
         public UnityEngine.Color IndicatorColor => indicatorColor;
+
+        public event System.Action<uint> OnMate;
+
+        [Button]
+        public void End()
+        {
+            OnMate?.Invoke(GameController.OpponentColor);
+        }
 
         private void Start()
         {
@@ -61,7 +71,7 @@ namespace YokAI
             for (byte cellId = 0; cellId < YGrid.SIZE; cellId++)
             {
                 uint cell = currentBan.Grid[cellId];
-                if (cell != Cell.EMPTY)
+                if (Occupation.Get(cell) != Occupation.NONE)
                 {
                     byte pieceId = Occupation.Get(cell);
                     YGrid.GetCoordinates(cellId, out int x, out int y);
@@ -97,6 +107,14 @@ namespace YokAI
                 if (capturedPieceId != PieceSet.INVALID_PIECE_ID)
                 {
                     AddPieceToPool(capturedPieceId, PColor.Get(GameController.Ban.PieceSet[capturedPieceId]));
+                }
+
+                _pieces[GameController.KingIds[GameController.PlayingColor - 1]].SetCheckPiece(GameController.IsInCheck);
+                _pieces[GameController.KingIds[GameController.OpponentColor - 1]].SetCheckPiece(false);
+
+                if (GameController.IsMate)
+                {
+                    OnMate?.Invoke(GameController.OpponentColor);
                 }
                 
                 return true;
