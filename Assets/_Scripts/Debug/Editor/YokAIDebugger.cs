@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEditor;
 using YokAI.POC;
@@ -64,6 +65,11 @@ public class YokAIDebugger : EditorWindow
     private void OnFocus()
     {
         BanDebugger.GetAvailableMoves(ref _availableMoves);
+    }
+
+    private void Update()
+    {
+        Repaint();
     }
 
     private void OnGUI()

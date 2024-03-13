@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
 using YokAI.GridProperties;
@@ -9,8 +11,8 @@ using YokAI.MoveProperties;
 using UColor = UnityEngine.Color;
 using PColor = YokAI.PieceProperties.Color;
 using YGrid = YokAI.Main.Grid;
-using Unity.VisualScripting;
 using NaughtyAttributes;
+using Debug = UnityEngine.Debug;
 
 namespace YokAI
 {
@@ -42,14 +44,20 @@ namespace YokAI
         {
             OnMate?.Invoke(GameController.OpponentColor);
         }
+
         [Button]
         public void EvaluateCurrentPosition()
         {
-            int eval = AIController.EvaluateCurrentPosition(_evaluationDepth, GameController.Ban, out string bestMove);
-            string evalStr = (eval > 0 ? "+" : string.Empty) + eval.ToString();
-            Debug.Log($"Best Move : " + bestMove + "  |  Evaluation : " + evalStr);
+            Task.Run(() =>
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                int eval = AIController.EvaluateCurrentPosition(_evaluationDepth, GameController.Ban, out string bestMove);
+                string evalStr = (eval > 0 ? "+" : string.Empty) + eval.ToString();
+                stopwatch.Stop();
+                Debug.Log($"Best Move : " + bestMove + "  |  Evaluation : " + evalStr + "  |  In : " + stopwatch.ElapsedMilliseconds/1000f +"s"); 
+           });
         }
-
+        
         private void Start()
         {
             GameController.SetupYokaiNoMoriPosition();
