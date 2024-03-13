@@ -247,6 +247,8 @@ namespace YokAI.Main
                 , out byte movingPieceId, out byte capturedPieceId, out byte startCellId, out byte targetCellId
                 , out bool isDrop, out bool hasPromoted, out bool hasUnpromoted);
 
+            Pass();
+
             uint opponentColor = Color.GetOpponent(PlayingColor);
             ref uint movingPiece = ref PieceSet.GetRef(movingPieceId);
             ref uint capturedPiece = ref PieceSet.GetRef(capturedPieceId);
@@ -269,10 +271,12 @@ namespace YokAI.Main
             Type.Set(ref capturedPiece, hasUnpromoted ? Type.GOLD : Type.Get(capturedPiece));
             Mobility.Set(ref capturedPiece, MobilityByPiece.Get(Color.Get(capturedPiece), Type.Get(capturedPiece)));
 
-            Bitboard.Uncapture(ref opponentOccupationBitboard, startCellId, targetCellId);
+            if (capturedPieceId != PieceSet.INVALID_PIECE_ID) // T_T
+            {
+                Bitboard.Uncapture(ref opponentOccupationBitboard, startCellId, targetCellId);
+            }
 
             UpdateControl();
-            Pass();
         }
 
         public void Pass()

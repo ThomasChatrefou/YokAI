@@ -34,7 +34,8 @@ namespace YokAI
 
         public event System.Action<uint> OnMate;
 
-        [SerializeField] private int _evaluationDepth = 0;
+
+        [SerializeField][Range(0,10)] private int _evaluationDepth = 0;
 
         [Button]
         public void End()

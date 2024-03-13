@@ -9,8 +9,9 @@ namespace YokAI.AI
     {
         public static int EvaluateCurrentPosition(int depth, Ban ban, out string bestMoveNotation)
         {
-            bestMoveNotation = Decryptor.GetNotationFromMove(Evaluator.BestMove, ban);
+            Evaluator.NbPositionReached = 0;
             int eval = Evaluator.Search(depth, ref ban);
+            bestMoveNotation = Decryptor.GetNotationFromMove(Evaluator.BestMove, ban);
             return eval;
         }
     }
@@ -18,9 +19,11 @@ namespace YokAI.AI
     public class Evaluator
     {
         public static uint BestMove { get; private set; } = Move.INVALID;
+        public static uint NbPositionReached = 0;
 
         public static int Search(int depth, ref Ban ban)
         {
+            ++NbPositionReached;
             if (depth == 0)
             {
                 return Evaluate(ref ban);
@@ -28,6 +31,8 @@ namespace YokAI.AI
             ban.GenerateMoves();
 
             int max = int.MinValue;
+            uint currentBestMove = Move.INVALID;
+
             uint[] availableMoves = ban.GetLastMoveGeneration();
             foreach (uint move in availableMoves)
             {
@@ -36,10 +41,11 @@ namespace YokAI.AI
                 if (score > max)
                 {
                     max = score;
-                    BestMove = move;
+                    currentBestMove = move;
                 }
                 ban.UnmakeMove(move);
             }
+            BestMove = currentBestMove;
             return max;
         }
 

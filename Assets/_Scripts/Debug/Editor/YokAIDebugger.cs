@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using YokAI.POC;
+using YokAI.AI;
 
 public class YokAIDebugger : EditorWindow
 {
@@ -210,6 +211,14 @@ public class YokAIDebugger : EditorWindow
     private void OpenAITab()
     {
         GUILayout.Label(Tabs.AI);
+
+        float width = 120f;
+
+        GUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("nb moves reached", GUILayout.Width(width));
+        EditorGUILayout.LabelField(Evaluator.NbPositionReached.ToString());
+        GUILayout.EndHorizontal();
+
         GUILayout.FlexibleSpace();
     }
 
