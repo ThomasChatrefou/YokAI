@@ -67,6 +67,13 @@ namespace YokAI.Main
             return checkingPieceId != Control.NONE;
         }
 
+        public bool IsOpponentKingOnPromotionZone()
+        {
+            byte opponentKingId = _kingIds[OpponentColor - 1];
+            byte kingCellId = Location.Get(PieceSet[opponentKingId]);
+            return PromotionZone.Get(kingCellId) == OpponentColor;
+        }
+
         public void GenerateMoves()
         {
             _generatedMovesCount = 0;

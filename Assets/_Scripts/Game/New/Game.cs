@@ -32,7 +32,8 @@ namespace YokAI.Main
 
         public static bool IsGameSet { get; private set; }
         public static bool IsInCheck { get { return Ban.IsInCheck(out bool _); } }
-        public static bool IsMate { get { return IsInCheck && AvailableMoves.Length == 0; } }
+
+        public static bool IsMate { get { return (IsInCheck && AvailableMoves.Length == 0) || Ban.IsOpponentKingOnPromotionZone(); } }
 
         public static byte[] KingIds { get { return Ban.KingIds; } }
 
