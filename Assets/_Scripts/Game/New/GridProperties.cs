@@ -75,12 +75,12 @@ namespace YokAI.GridProperties
 
     public static class Cell
     {
-        public const uint INVALID = Occupation.NONE;
-        public const uint EMPTY = Occupation.NONE;
+        public const uint INVALID = Occupation.NONE | (Control.NONE << Control.SHIFT) | (Control.NONE << (2 * Control.SHIFT));
+        public const uint EMPTY = Occupation.NONE | (Control.NONE << Control.SHIFT) | (Control.NONE << (2 * Control.SHIFT));
 
         public static uint Create(uint occupation)
         {
-            return occupation;
+            return occupation | (Control.NONE << Control.SHIFT) | (Control.NONE << (2 * Control.SHIFT));
         }
     }
 
@@ -99,6 +99,28 @@ namespace YokAI.GridProperties
         {
             cell &= ~FILTER;
             cell |= pieceId;
+        }
+    }
+
+    public static class Control
+    {
+        public const byte SHIFT = 4;
+        public const uint FILTER = 0xf;
+
+        public const byte MULTIPLE = 0xe;
+        public const byte NONE = 0xf;
+
+        public static byte Get(uint cell, uint color)
+        {
+            byte shift = (byte)(color * SHIFT);
+            return (byte)((cell & (FILTER << shift)) >> shift);
+        }
+
+        public static void Set(ref uint cell, uint pieceId, uint color)
+        {
+            byte shift = (byte)(color * SHIFT);
+            cell &= ~(FILTER << shift);
+            cell |= pieceId << shift;
         }
     }
 

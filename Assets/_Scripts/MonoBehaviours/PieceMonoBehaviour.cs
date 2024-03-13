@@ -44,7 +44,7 @@ namespace YokAI
             _isGrabbed = true;
             FlipFlopIndicator();
             
-            BanManager.instance.MoveIndicator(pieceID, true);
+            BanManager.Instance.MoveIndicator(pieceID, true);
             followMouseCoroutine = StartCoroutine(FollowMouse());
         }
 
@@ -53,14 +53,14 @@ namespace YokAI
             if (_isGrabbed)
             {
                 Vector2 targetPos = GetNearestPos(transform.position);
-                if (IsInBounds() && BanManager.instance.CheckIfCanMake(pieceID, originalPosition, targetPos)) //check if move is legal and/or make move
+                if (IsInBounds() && BanManager.Instance.CheckIfCanMake(pieceID, originalPosition, targetPos)) //check if move is legal and/or make move
                     originalPosition = targetPos;
                 
                 StopCoroutine(followMouseCoroutine);
                 _isGrabbed = false;
                 transform.position = originalPosition;
                 FlipFlopIndicator();
-                BanManager.instance.MoveIndicator(pieceID, false);
+                BanManager.Instance.MoveIndicator(pieceID, false);
             }
         }
 
@@ -104,7 +104,7 @@ namespace YokAI
 
         private void FlipFlopIndicator()
         {
-            Color indicatorColor = BanManager.instance.IndicatorColor;
+            Color indicatorColor = BanManager.Instance.IndicatorColor;
             float alpha = indicator.color.a > 0 ? 0 : indicatorColor.a;
             
             indicator.color = new Color(indicatorColor.r, indicatorColor.g, indicatorColor.b, alpha);

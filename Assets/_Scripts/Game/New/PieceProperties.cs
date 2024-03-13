@@ -84,6 +84,7 @@ namespace YokAI.PieceProperties
         public const uint ROOK = 3;
         public const uint GOLD = 4;
         public const uint KING = 5;
+        public static uint CHAD => KING;
 
         public static uint Get(uint piece)
         {
