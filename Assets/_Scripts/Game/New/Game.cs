@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using YokAI.PieceProperties;
 using YokAI.MoveProperties;
 using YokAI.GridProperties;
+using Unity.VisualScripting;
 
 namespace YokAI.Main
 {

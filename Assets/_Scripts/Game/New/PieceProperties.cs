@@ -19,7 +19,9 @@ namespace YokAI.PieceProperties
                 { Piece.Create(Color.WHITE, Type.ROOK), Mobility.ROOK },
                 { Piece.Create(Color.BLACK, Type.ROOK), Mobility.ROOK },
                 { Piece.Create(Color.WHITE, Type.KING), Mobility.KING },
-                { Piece.Create(Color.BLACK, Type.KING), Mobility.KING }
+                { Piece.Create(Color.BLACK, Type.KING), Mobility.KING },
+                { Piece.Create(Color.WHITE, Type.NONE), Mobility.NONE },
+                { Piece.Create(Color.BLACK, Type.NONE), Mobility.NONE }
             };
         }
 

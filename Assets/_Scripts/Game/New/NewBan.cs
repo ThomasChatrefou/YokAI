@@ -100,7 +100,7 @@ namespace YokAI.Main
 
                     if (Bitboard.Contains(reachableCells, checkingPieceCellId))
                     {
-                        GenerateMove(pieceId, startCellId, checkingPieceCellId, mobility);
+                        GeneratePieceMove(pieceId, startCellId, checkingPieceCellId, mobility);
                     }
                 }
             }
@@ -128,7 +128,7 @@ namespace YokAI.Main
                     if (Type.Get(movingPiece) == Type.CHAD && Control.Get(Grid[targetCellId], OpponentColor) != Control.NONE)
                         continue;
 
-                    GenerateMove(pieceId, startCellId, targetCellId, mobility);
+                    GeneratePieceMove(pieceId, startCellId, targetCellId, mobility);
                 }
             }
         }
@@ -162,7 +162,7 @@ namespace YokAI.Main
             }
         }
 
-        public void GenerateMove(byte movingPieceId, byte startCellId, byte targetCellId, uint mobility)
+        public void GeneratePieceMove(byte movingPieceId, byte startCellId, byte targetCellId, uint mobility)
         {
             byte capturedPieceId = Occupation.Get(Grid[targetCellId]);
             uint move = Move.Create(movingPieceId, capturedPieceId, startCellId, targetCellId

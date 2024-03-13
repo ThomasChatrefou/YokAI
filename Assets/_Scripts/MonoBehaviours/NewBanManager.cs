@@ -3,6 +3,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using YokAI.GridProperties;
 using YokAI.Main;
+using YokAI.AI;
 using YokAI.PieceProperties;
 using YokAI.MoveProperties;
 using UColor = UnityEngine.Color;
@@ -33,10 +34,19 @@ namespace YokAI
 
         public event System.Action<uint> OnMate;
 
+        [SerializeField] private int _evaluationDepth = 0;
+
         [Button]
         public void End()
         {
             OnMate?.Invoke(GameController.OpponentColor);
+        }
+        [Button]
+        public void EvaluateCurrentPosition()
+        {
+            int eval = AIController.EvaluateCurrentPosition(_evaluationDepth, GameController.Ban, out string bestMove);
+            string evalStr = (eval > 0 ? "+" : string.Empty) + eval.ToString();
+            Debug.Log($"Best Move : " + bestMove + "  |  Evaluation : " + evalStr);
         }
 
         private void Start()
