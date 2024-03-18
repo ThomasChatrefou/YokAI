@@ -29,7 +29,7 @@ namespace YokAI.POC
 
             log += $"Playing Color : " + GetPlayingColor() + "\n";
             log += $"Move Number : {Ban.MoveNumber}\n";
-            Debug.Log(log);
+            UnityEngine.Debug.Log(log);
         }
 
         public static string GetPlayingColor()
@@ -100,7 +100,7 @@ namespace YokAI.POC
             string log = "[DEBUG] Draw\n";
             if (source != null) log += " from " + source;
             DrawBanInDebugLog(ref log);
-            Debug.Log(log);
+            UnityEngine.Debug.Log(log);
         }
 
         private static void DrawBanInDebugLog(ref string log)

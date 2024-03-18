@@ -1,4 +1,4 @@
-namespace YokAI.MoveProperties
+namespace YokAI.Properties
 {
     public static class Move
     {

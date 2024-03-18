@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using YokAI;
-using PColor = YokAI.PieceProperties.Color;
+using PColor = YokAI.Properties.Color;
 
 public class UIManager : MonoBehaviour
 {

@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using PColor = YokAI.PieceProperties.Color;
 
 namespace YokAI
 {

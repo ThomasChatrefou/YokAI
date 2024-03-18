@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
-using YokAI.POC;
 
-namespace YokAI
+namespace YokAI.POC
 {
     public class BanManager : _Scripts.Utilities.Singleton<BanManager>
     {

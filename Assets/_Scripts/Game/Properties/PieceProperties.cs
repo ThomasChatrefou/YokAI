@@ -1,7 +1,25 @@
 using System.Collections.Generic;
 
-namespace YokAI.PieceProperties
+namespace YokAI.Properties
 {
+    public static class Piece
+    {
+        public const uint INVALID = (Color.NONE << Color.SHIFT)
+                                    | (Type.NONE << Type.SHIFT)
+                                    | (Mobility.NONE << Mobility.SHIFT)
+                                    | Location.NONE;
+
+        public static uint Create(uint color, uint type, uint mobility, uint location)
+        {
+            return (color << Color.SHIFT) | (type << Type.SHIFT) | (mobility << Mobility.SHIFT) | location;
+        }
+
+        public static uint Create(uint color, uint type)
+        {
+            return Create(color, type, Mobility.NONE, Location.NONE);
+        }
+    }
+
     public static class MobilityByPiece
     {
         private static Dictionary<uint, uint> _table;
@@ -28,24 +46,6 @@ namespace YokAI.PieceProperties
         public static uint Get(uint color, uint type)
         {
             return _table[Piece.Create(color, type)];
-        }
-    }
-
-    public static class Piece
-    {
-        public const uint INVALID = (Color.NONE << Color.SHIFT)
-                                    | (Type.NONE << Type.SHIFT)
-                                    | (Mobility.NONE << Mobility.SHIFT)
-                                    | Location.NONE;
-
-        public static uint Create(uint color, uint type, uint mobility, uint location)
-        {
-            return (color << Color.SHIFT) | (type << Type.SHIFT) | (mobility << Mobility.SHIFT) | location;
-        }
-
-        public static uint Create(uint color, uint type)
-        {
-            return Create(color, type, Mobility.NONE, Location.NONE);
         }
     }
 

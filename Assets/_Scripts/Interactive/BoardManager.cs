@@ -1,17 +1,15 @@
+using NaughtyAttributes;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
-using YokAI.GridProperties;
-using YokAI.Main;
 using YokAI.AI;
-using YokAI.PieceProperties;
-using YokAI.MoveProperties;
+using YokAI.Main;
+using YokAI.Properties;
 using UColor = UnityEngine.Color;
-using PColor = YokAI.PieceProperties.Color;
+using PColor = YokAI.Properties.Color;
 using YGrid = YokAI.Main.Grid;
-using NaughtyAttributes;
 using Debug = UnityEngine.Debug;
 
 namespace YokAI
@@ -86,7 +84,7 @@ namespace YokAI
 
         private void InitBoard()
         {
-            Ban currentBan = GameController.Ban;
+            YokAIBan currentBan = GameController.Ban;
             for (byte cellId = 0; cellId < YGrid.SIZE; cellId++)
             {
                 uint cell = currentBan.Grid[cellId];

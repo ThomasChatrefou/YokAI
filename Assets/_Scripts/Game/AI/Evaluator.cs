@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using YokAI.Main;
-using YokAI.PieceProperties;
-using YokAI.MoveProperties;
+using YokAI.Properties;
 
 namespace YokAI.AI
 {
     public static class AIController
     {
-        public static int EvaluateCurrentPosition(int depth, Ban ban, out string bestMoveNotation)
+        public static int EvaluateCurrentPosition(int depth, YokAIBan ban, out string bestMoveNotation)
         {
             Evaluator.NbPositionReached = 0;
             int eval = Evaluator.Search(depth, ref ban);
@@ -21,7 +20,7 @@ namespace YokAI.AI
         public static uint BestMove { get; private set; } = Move.INVALID;
         public static uint NbPositionReached = 0;
 
-        public static int Search(int depth, ref Ban ban)
+        public static int Search(int depth, ref YokAIBan ban)
         {
             ++NbPositionReached;
             if (depth == 0)
@@ -49,7 +48,7 @@ namespace YokAI.AI
             return max;
         }
 
-        public static int Evaluate(ref Ban ban)
+        public static int Evaluate(ref YokAIBan ban)
         {
             int score = 0;
             for (byte pieceId = 0; pieceId < ban.PieceSet.Size; pieceId++)

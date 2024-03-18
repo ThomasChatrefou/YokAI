@@ -5,7 +5,7 @@ using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace YokAI
+namespace YokAI.POC
 {
     public class PieceMonobehaviour : MonoBehaviour
     { 

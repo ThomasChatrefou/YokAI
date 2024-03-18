@@ -1,10 +1,8 @@
-using YokAI.GridProperties;
-using YokAI.MoveProperties;
-using YokAI.PieceProperties;
+using YokAI.Properties;
 
 namespace YokAI.Main
 {
-    public class Ban
+    public class YokAIBan
     {
         public const byte MAX_AVAILABLE_MOVES = 64;
 
@@ -20,7 +18,7 @@ namespace YokAI.Main
 
         private byte[] _kingIds;
 
-        public Ban()
+        public YokAIBan()
         {
             Grid = new Grid();
             _generatedMoves = new uint[MAX_AVAILABLE_MOVES];
