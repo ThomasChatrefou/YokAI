@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using YokAI.Properties;
 using YokAI.Debugging;
+using YokAI.Main;
 
-namespace YokAI.Main
+namespace YokAI.Notation
 {
     public static class Decryptor
     {
@@ -18,21 +19,21 @@ namespace YokAI.Main
         {
             PieceTypeBySymbol = new Dictionary<char, uint>()
             {
-                [' '] = Type.NONE,
-                ['p'] = Type.PAWN,
-                ['b'] = Type.BISHOP,
-                ['r'] = Type.ROOK,
-                ['g'] = Type.GOLD,
-                ['k'] = Type.KING
+                [Symbol.INVALID]    = Type.NONE,
+                [Symbol.PAWN]       = Type.PAWN,
+                [Symbol.BISHOP]     = Type.BISHOP,
+                [Symbol.ROOK]       = Type.ROOK,
+                [Symbol.GOLD]       = Type.GOLD,
+                [Symbol.KING]       = Type.KING
             };
             SymbolByPieceType = new Dictionary<uint, char>()
             {
-                [Type.NONE] = ' ',
-                [Type.PAWN] = 'p',
-                [Type.BISHOP] = 'b',
-                [Type.ROOK] = 'r',
-                [Type.GOLD] = 'g',
-                [Type.KING] = 'k',
+                [Type.NONE]     = Symbol.INVALID,
+                [Type.PAWN]     = Symbol.PAWN,
+                [Type.BISHOP]   = Symbol.BISHOP,
+                [Type.ROOK]     = Symbol.ROOK,
+                [Type.GOLD]     = Symbol.GOLD,
+                [Type.KING]     = Symbol.KING,
             };
         }
 
@@ -53,7 +54,7 @@ namespace YokAI.Main
             if (!SymbolByPieceType.TryGetValue(type, out char result))
             {
                 Logger.LogUnknownProperty(nameof(Decryptor));
-                return '?';
+                return Symbol.UNKNOWN;
             }
 
             uint color = Color.Get(piece);
@@ -64,7 +65,7 @@ namespace YokAI.Main
             else if (color != Color.BLACK)
             {
                 Logger.LogUnknownProperty(nameof(Decryptor));
-                return '?';
+                return Symbol.UNKNOWN;
             }
 
             return result;
@@ -79,8 +80,6 @@ namespace YokAI.Main
             uint movingPiece = currentBan.PieceSet[movingPieceId];
             uint capturedPiece = currentBan.PieceSet[capturedPieceId];
             char movingPieceSymbol = GetSymbolFromPiece(movingPiece);
-            char capturedPieceSymbol = GetSymbolFromPiece(capturedPiece);
-
 
             Grid.GetCoordinates(startCellId, out int startCellFile, out int startCellRank);
             Grid.GetCoordinates(targetCellId, out int targetCellFile, out int targetCellRank);
@@ -93,39 +92,38 @@ namespace YokAI.Main
             notation += movingPieceSymbol;
             if (hasPromoted)
             {
-                notation += '=';
-                notation += Color.Get(movingPiece) == Color.WHITE ? 'G' : 'g';
+                notation += Symbol.PROMOTION;
+                notation += Color.Get(movingPiece) == Color.WHITE ? char.ToUpper(Symbol.GOLD) : Symbol.GOLD;
             }
-            if (!UseReducedNotation)
+            if (!UseReducedNotation && startCellId != Grid.INVALID_CELL_ID)
             {
                 notation += startCellFileAscii;
-                notation += $"{startCellRank + 1}";
+                notation += (startCellRank + 1).ToString();
             }
 
             if (isDrop)
             {
-                notation += '*';
+                notation += Symbol.DROP;
             }
             if (capturedPieceId != PieceSet.INVALID_PIECE_ID)
             {
-                notation += 'x';
+                char capturedPieceSymbol = GetSymbolFromPiece(capturedPiece);
+                notation += Symbol.CAPTURE;
                 if (!UseReducedNotation & UseCompleteNotation)
                 {
-                    if (capturedPieceSymbol != '?')
+                    if (capturedPieceSymbol != Symbol.UNKNOWN)
                     {
                         notation += capturedPieceSymbol;
                     }
                     if (hasUnpromoted)
                     {
-                        notation += '=';
-                        notation += Color.Get(capturedPiece) == Color.WHITE ? 'P' : 'p';
+                        notation += Symbol.PROMOTION;
+                        notation += Color.Get(capturedPiece) == Color.WHITE ? char.ToUpper(Symbol.PAWN) : Symbol.PAWN;
                     }
                 }
             }
             notation += targetCellFileAscii;
-            notation += $"{targetCellRank + 1}";
-
-            // [ADD] '+' when Check 
+            notation += (targetCellRank + 1).ToString();
 
             return notation;
         }

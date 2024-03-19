@@ -1,5 +1,6 @@
 using YokAI.Properties;
 using YokAI.Debugging;
+using YokAI.Notation;
 
 namespace YokAI.Main
 {
@@ -14,7 +15,7 @@ namespace YokAI.Main
         public static int MoveNumber { get { return _moveNumber; } }
         public static uint LastMove { get; private set; }
 
-        public static bool IsGenerationDirty { get; private set; } = true;
+        public static bool IsGenerationDirty { get; private set; }
         public static uint[] AvailableMoves
         {
             get
@@ -33,8 +34,17 @@ namespace YokAI.Main
 
         static GameController()
         {
+            Reset();
+        }
+
+        public static void Reset()
+        {
             Ban = new YokAIBan();
             IsGameSet = false;
+            LastMove = Move.INVALID;
+            _moveNumber = 0;
+            IsGenerationDirty = true;
+            _availableMoves = new uint[0];
         }
 
         public static uint CreateMove(byte movingPieceId, int startCoordX, int startCoordY, int targetCoordX, int targetCoordY)
@@ -155,7 +165,7 @@ namespace YokAI.Main
             IsGenerationDirty = true;
         }
 
-        private static int _moveNumber = 0;
+        private static int _moveNumber;
         private static uint[] _availableMoves;
     }
 }

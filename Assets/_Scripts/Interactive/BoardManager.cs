@@ -14,10 +14,10 @@ using Debug = UnityEngine.Debug;
 
 namespace YokAI
 {
-    public class NewBanManager : _Scripts.Utilities.Singleton<NewBanManager>
+    public class BoardManager : _Scripts.Utilities.Singleton<BoardManager>
     {
-        [SerializeField] private UnityEngine.Color indicatorColor;
-        [SerializeField] private UnityEngine.Color moveIndicatorColor;
+        [SerializeField] private UColor indicatorColor;
+        [SerializeField] private UColor moveIndicatorColor;
 
         [SerializeField] private GameObject[] whitePiecesBank;
         [SerializeField] private GameObject[] blackPiecesBank;
@@ -28,9 +28,9 @@ namespace YokAI
         [SerializeField] public UColor BlackColor;
         
         private Dictionary<byte, PieceController> _pieces = new();
-        private Dictionary<(byte, uint), Transform> pools = new();
+        private Dictionary<(byte, uint), Transform> _pools = new();
 
-        public UnityEngine.Color IndicatorColor => indicatorColor;
+        public UColor IndicatorColor => indicatorColor;
 
         public event System.Action<uint> OnMate;
 
@@ -59,7 +59,33 @@ namespace YokAI
         private void Start()
         {
             GameController.SetupYokaiNoMoriPosition();
+            SetupBoard();
+        }
 
+        private void OnDisable()
+        {
+            GameController.Reset();
+        }
+
+        public void ResetBoard()
+        {
+            foreach (PieceController pieceController in _pieces.Values)
+            {
+                Destroy(pieceController.transform.gameObject);
+            }
+            _pieces = new();
+            _pools = new();
+        }
+
+        public void SetupBoard()
+        {
+            CreatePieces();
+            DefinePiecesPositionInPools();
+            InitBoard();
+        }
+
+        private void CreatePieces()
+        {
             PieceSet pieceSet = GameController.Ban.PieceSet;
             for (byte pieceId = 0; pieceId < GameController.Ban.PieceSet.Size; pieceId++)
             {
@@ -70,30 +96,32 @@ namespace YokAI
                 pieceController.PieceID = pieceId;
                 pieceController.ChangeColor(pieceColor == PColor.WHITE);
                 _pieces.Add(pieceId, pieceController);
-                
-                if (pieceType == Type.PAWN || pieceType == Type.BISHOP || pieceType == Type.ROOK)
-                {
-                    
-                    pools[(pieceId, PColor.WHITE)] = poolPositions[(pieceType - 1)*2 + pieceColor - 1];
-                    pools[(pieceId, PColor.BLACK)] = poolPositions[(pieceType - 1)*2 + pieceColor - 1 + 6];
-                }
             }
-
-            InitBoard();
         }
 
+        private void DefinePiecesPositionInPools()
+        {
+            PieceSet pieceSet = GameController.Ban.PieceSet;
+            for (byte pieceId = 0; pieceId < GameController.Ban.PieceSet.Size; pieceId++)
+            {
+                uint pieceType = Type.Get(pieceSet[pieceId]);
+                uint pieceColor = PColor.Get(pieceSet[pieceId]);
+                if (pieceType == Type.PAWN || pieceType == Type.BISHOP || pieceType == Type.ROOK)
+                {
+
+                    _pools[(pieceId, PColor.WHITE)] = poolPositions[(pieceType - 1) * 2 + pieceColor - 1];
+                    _pools[(pieceId, PColor.BLACK)] = poolPositions[(pieceType - 1) * 2 + pieceColor - 1 + 6];
+                }
+            }
+        }
+        
         private void InitBoard()
         {
-            YokAIBan currentBan = GameController.Ban;
-            for (byte cellId = 0; cellId < YGrid.SIZE; cellId++)
+            for (byte pieceId = 0; pieceId < GameController.Ban.PieceSet.Size; pieceId++)
             {
-                uint cell = currentBan.Grid[cellId];
-                if (Occupation.Get(cell) != Occupation.NONE)
-                {
-                    byte pieceId = Occupation.Get(cell);
-                    YGrid.GetCoordinates(cellId, out int x, out int y);
-                    MovePieceOnBoard(pieceId, new Vector2Int(x, y));
-                }
+                byte cellId = Location.Get(GameController.Ban.PieceSet[pieceId]);
+                YGrid.GetCoordinates(cellId, out int x, out int y);
+                MovePieceOnBoard(pieceId, new Vector2Int(x, y));
             }
         }
 
@@ -110,33 +138,38 @@ namespace YokAI
             uint inputMove = GameController.CreateMove(pieceId, startCoord.x, startCoord.y, targetCoord.x, targetCoord.y);
             if (GameController.IsGameSet && GameController.TryMakeMove(inputMove))
             {
-                byte capturedPieceId = CapturedPiece.Get(inputMove);
-
-                if (Promote.Get(inputMove))
-                {
-                    _pieces[pieceId].ChangePromotionPawn(true);
-                }
-                if (Unpromote.Get(inputMove))
-                {
-                    _pieces[capturedPieceId].ChangePromotionPawn(false);
-                }
-                
-                if (capturedPieceId != PieceSet.INVALID_PIECE_ID)
-                {
-                    AddPieceToPool(capturedPieceId, PColor.Get(GameController.Ban.PieceSet[capturedPieceId]));
-                }
-
-                _pieces[GameController.KingIds[GameController.PlayingColor - 1]].SetCheckPiece(GameController.IsInCheck);
-                _pieces[GameController.KingIds[GameController.OpponentColor - 1]].SetCheckPiece(false);
-
-                if (GameController.IsMate)
-                {
-                    OnMate?.Invoke(GameController.OpponentColor);
-                }
-                
+                MakeMoveOnTheBoard(inputMove);
                 return true;
             }
             return false;
+        }
+
+        public void MakeMoveOnTheBoard(uint inputMove)
+        {
+            byte movingPieceId = MovingPiece.Get(inputMove);
+            byte capturedPieceId = CapturedPiece.Get(inputMove);
+
+            if (Promote.Get(inputMove))
+            {
+                _pieces[movingPieceId].ChangePromotionPawn(true);
+            }
+            if (Unpromote.Get(inputMove))
+            {
+                _pieces[capturedPieceId].ChangePromotionPawn(false);
+            }
+
+            if (capturedPieceId != PieceSet.INVALID_PIECE_ID)
+            {
+                AddPieceToPool(capturedPieceId, PColor.Get(GameController.Ban.PieceSet[capturedPieceId]));
+            }
+
+            _pieces[GameController.KingIds[GameController.PlayingColor - 1]].SetCheckPiece(GameController.IsInCheck);
+            _pieces[GameController.KingIds[GameController.OpponentColor - 1]].SetCheckPiece(false);
+
+            if (GameController.IsMate)
+            {
+                OnMate?.Invoke(GameController.OpponentColor);
+            }
         }
 
         public void MoveIndicator(byte pieceId, bool toggle)
@@ -161,7 +194,7 @@ namespace YokAI
 
         private void AddPieceToPool(byte pieceId, uint poolColor)
         {
-            Vector3 newPos = pools[(pieceId, poolColor)].position;
+            Vector3 newPos = _pools[(pieceId, poolColor)].position;
 
             _pieces[pieceId].transform.position = newPos;
             _pieces[pieceId].OriginalPosition = newPos;

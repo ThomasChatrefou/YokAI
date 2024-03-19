@@ -1,23 +1,23 @@
 using UnityEngine;
 using UnityEditor;
-using YokAI.POC;
+using YokAI.Notation;
 
 namespace YokAI.Debugging
 {
     public class DebugGameTab : DebuggerTab
     {
+        public const float SPACE_BETWEEN_PARTS = 10f;
+
         public override void Open()
         {
-            BanDebugger.GetAvailableMoves(ref _availableMoves);
-
-            GUILayout.Label(TabNames.GAME, EditorStyles.whiteLargeLabel);
-            GUILayout.Space(10);
+            //GUILayout.Label(TabNames.GAME, EditorStyles.whiteLargeLabel);
+            GUILayout.Space(SPACE_BETWEEN_PARTS);
 
             PrintGameInformation();
-            GUILayout.Space(10);
+            GUILayout.Space(SPACE_BETWEEN_PARTS);
 
             HandleMoveMaking();
-            GUILayout.Space(10);
+            GUILayout.Space(SPACE_BETWEEN_PARTS);
 
             HandlePositionLoading();
 
@@ -33,23 +33,34 @@ namespace YokAI.Debugging
 
             GUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(Labels.PLAYING_COLOR, GUILayout.Width(width));
-            EditorGUILayout.LabelField(BanDebugger.GetPlayingColor());
+            EditorGUILayout.LabelField(YokAIDebugger.GetPlayingColor());
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(Labels.MOVE_NUMBER, GUILayout.Width(width));
-            EditorGUILayout.LabelField(BanDebugger.GetMoveNumber());
+            EditorGUILayout.LabelField(YokAIDebugger.GetMoveNumber());
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(Labels.LAST_MOVE, GUILayout.Width(width));
-            EditorGUILayout.LabelField(BanDebugger.GetLastMove());
+            EditorGUILayout.LabelField(YokAIDebugger.GetLastMove());
             GUILayout.EndHorizontal();
 
+            YokAIDebugger.GetAvailableMoves(ref _availableMoves);
             GUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(Labels.AVAILABLE_MOVES, GUILayout.Width(width));
-            EditorGUILayout.SelectableLabel(_availableMoves, GUILayout.Height(GUI.skin.textField.lineHeight));
+            EditorGUILayout.SelectableLabel(_availableMoves[0], GUILayout.Height(GUI.skin.textField.lineHeight));
             GUILayout.EndHorizontal();
+            if (_availableMoves.Length > 1)
+            {
+                for (int i = 1; i < _availableMoves.Length; ++i)
+                {
+                    GUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField(string.Empty, GUILayout.Width(width));
+                    EditorGUILayout.SelectableLabel(_availableMoves[i], GUILayout.Height(GUI.skin.textField.lineHeight));
+                    GUILayout.EndHorizontal();
+                }
+            }
         }
 
         public void HandleMoveMaking()
@@ -61,25 +72,15 @@ namespace YokAI.Debugging
             _userInputNotation = EditorGUILayout.TextArea(_userInputNotation, GUILayout.Width(width));
             bool doValidate = GUILayout.Button(Buttons.VALIDATE, GUILayout.Width(width));
             bool doPass = GUILayout.Button(Buttons.PASS_TURN, GUILayout.Width(width));
-            EditorGUILayout.LabelField(_feedbackOnMove);
             GUILayout.EndHorizontal();
 
             if (doValidate)
             {
-                if (BanDebugger.SendUserInputMove(_userInputNotation))
-                {
-                    BanDebugger.GetAvailableMoves(ref _availableMoves);
-                    BanDebugger.DrawBanInConsole();
-                }
-                else
-                {
-                    UnityEngine.Debug.Log(Feedbacks.INVALID);
-                }
+                YokAIDebugger.SendUserInputMove(_userInputNotation);
             }
             if (doPass)
             {
-                BanDebugger.PassTurn();
-                BanDebugger.GetAvailableMoves(ref _availableMoves);
+                YokAIDebugger.PassTurn();
             }
         }
 
@@ -102,39 +103,28 @@ namespace YokAI.Debugging
 
             if (doLoad)
             {
-                BanDebugger.LoadSFEN(_userInputSFEN);
+                YokAIDebugger.LoadPosition(_userInputSFEN);
             }
             if (doSave)
             {
-                UnityEngine.Debug.Log("Not implemented yet");
+                YokAIDebugger.SavePosition();
             }
             if (doEmpty)
             {
-                BanDebugger.SetupEmptyPosition();
+                YokAIDebugger.EmptyPosition();
             }
             if (doStarting)
             {
-                BanDebugger.SetupStartingPosition();
-            }
-            if (doLoad || doEmpty || doStarting)
-            {
-                _feedbackOnMove = " ";
-                BanDebugger.GetAvailableMoves(ref _availableMoves);
-                BanDebugger.DrawBanInConsole();
+                YokAIDebugger.RestartPosition();
             }
         }
 
         public void HandleFooter()
         {
-            if (GUILayout.Button(Buttons.DRAW))
-            {
-                BanDebugger.DrawBanInConsole();
-            }
         }
 
-        private string _availableMoves;
+        private string[] _availableMoves = new string[1] { Symbol.INVALID.ToString() };
         private string _userInputNotation;
         private string _userInputSFEN;
-        private string _feedbackOnMove;
     }
 }

@@ -1,19 +1,16 @@
 using NaughtyAttributes;
 using UnityEngine;
+using YokAI.Main;
 
-namespace YokAI.POC
+namespace YokAI.UnitTests
 {
-    namespace Test
+    [CreateAssetMenu(menuName = "Test/PositionLoader", fileName = "Test_PositionLoader")]
+    public class PositionLoaderTest : ScriptableObject
     {
-        [CreateAssetMenu(menuName = "Test/PositionLoader", fileName = "Test_PositionLoader")]
-        public class PositionLoaderTest : ScriptableObject
+        [Button]
+        public void TestStartPosition()
         {
-            [Button]
-            public void TestStartPosition()
-            {
-                PositionLoader.LoadPositionFromSFEN(PositionLoader.STARTING_POSITION);
-                BanDebugger.DebugLog();
-            }
+            GameController.SetupYokaiNoMoriPosition();
         }
     }
 }

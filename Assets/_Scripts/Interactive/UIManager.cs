@@ -10,13 +10,13 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        NewBanManager.Instance.OnMate += EndGame;
+        BoardManager.Instance.OnMate += EndGame;
     }
 
     public void EndGame(uint color)
     {
         gameObject.transform.GetChild(0).gameObject.SetActive(true);
-        Text.color = color == PColor.WHITE ? NewBanManager.Instance.WhiteColor : NewBanManager.Instance.BlackColor;
+        Text.color = color == PColor.WHITE ? BoardManager.Instance.WhiteColor : BoardManager.Instance.BlackColor;
     }
 
     public void RestartGame()

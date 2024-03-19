@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using YokAI.Main;
 using YokAI.Properties;
+using YokAI.Notation;
 
 namespace YokAI.AI
 {

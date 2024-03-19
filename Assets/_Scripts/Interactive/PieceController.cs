@@ -35,8 +35,8 @@ namespace YokAI
             indicator = GameObject.FindWithTag("Indicator").GetComponent<SpriteRenderer>();
 
             originalSprite = GetComponent<SpriteRenderer>().sprite;
-            GetComponent<SpriteRenderer>().sharedMaterial.SetColor("_WhiteColor", NewBanManager.Instance.WhiteColor);
-            GetComponent<SpriteRenderer>().sharedMaterial.SetColor("_BlackColor", NewBanManager.Instance.BlackColor);
+            GetComponent<SpriteRenderer>().sharedMaterial.SetColor("_WhiteColor", BoardManager.Instance.WhiteColor);
+            GetComponent<SpriteRenderer>().sharedMaterial.SetColor("_BlackColor", BoardManager.Instance.BlackColor);
 
             originalPosition = transform.position;
         }
@@ -46,7 +46,7 @@ namespace YokAI
             _isGrabbed = true;
             FlipFlopIndicator();
 
-            NewBanManager.Instance.MoveIndicator(pieceID, true);
+            BoardManager.Instance.MoveIndicator(pieceID, true);
             followMouseCoroutine = StartCoroutine(FollowMouse());
         }
 
@@ -55,14 +55,14 @@ namespace YokAI
             if (_isGrabbed)
             {
                 Vector2 targetPos = GetNearestPos(transform.position);
-                if (IsInBounds() && NewBanManager.Instance.CheckIfCanMake(pieceID, originalPosition, targetPos)) //check if move is legal and/or make move
+                if (IsInBounds() && BoardManager.Instance.CheckIfCanMake(pieceID, originalPosition, targetPos)) //check if move is legal and/or make move
                     originalPosition = targetPos;
 
                 StopCoroutine(followMouseCoroutine);
                 _isGrabbed = false;
                 transform.position = originalPosition;
                 FlipFlopIndicator();
-                NewBanManager.Instance.MoveIndicator(pieceID, false);
+                BoardManager.Instance.MoveIndicator(pieceID, false);
             }
         }
 
@@ -106,7 +106,7 @@ namespace YokAI
 
         private void FlipFlopIndicator()
         {
-            Color indicatorColor = NewBanManager.Instance.IndicatorColor;
+            Color indicatorColor = BoardManager.Instance.IndicatorColor;
             float alpha = indicator.color.a > 0 ? 0 : indicatorColor.a;
 
             indicator.color = new Color(indicatorColor.r, indicatorColor.g, indicatorColor.b, alpha);
