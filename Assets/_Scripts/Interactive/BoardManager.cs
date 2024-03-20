@@ -183,7 +183,12 @@ namespace YokAI
             _pieces[pieceId].ChangeColor(poolColor == PColor.WHITE);
         }
 
-        public IEnumerator AIMovePiece(uint move, float animTime)
+        public void AIMovePiece(uint move, float animTime)
+        {
+            StartCoroutine(AIMovePiece_Coroutine(move, animTime));
+        }
+        
+        private IEnumerator AIMovePiece_Coroutine(uint move, float animTime)
         {
             float time = 0;
             YGrid.GetCoordinates(TargetCell.Get(move), out int x, out int y);

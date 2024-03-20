@@ -81,7 +81,7 @@ namespace YokAI.AI
                 Debug.Log("Best Move found is : " + Decryptor.GetNotationFromMove(bestMove, GameController.Ban));
             });
 
-            StartCoroutine(BoardManager.Instance.AIMovePiece(player.Evaluator.BestMove, .2f));
+            BoardManager.Instance.AIMovePiece(player.Evaluator.BestMove, .2f);
         }
     }
 }
