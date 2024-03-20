@@ -14,7 +14,7 @@ namespace YokAI.Debugging
 
             GUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(Labels.NB_POSITION_REACHED, GUILayout.Width(width));
-            EditorGUILayout.LabelField(Evaluator.NbPositionReached.ToString());
+            EditorGUILayout.LabelField(AIManager.Instance.playerOne.Evaluator.NbPositionReached.ToString());
             GUILayout.EndHorizontal();
 
             GUILayout.FlexibleSpace();

@@ -1,16 +1,14 @@
-using NaughtyAttributes;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
-using YokAI.AI;
 using YokAI.Main;
 using YokAI.Properties;
 using UColor = UnityEngine.Color;
 using PColor = YokAI.Properties.Color;
 using YGrid = YokAI.Main.Grid;
-using Debug = UnityEngine.Debug;
+
 
 namespace YokAI
 {
@@ -33,28 +31,6 @@ namespace YokAI
         public UColor IndicatorColor => indicatorColor;
 
         public event System.Action<uint> OnMate;
-
-
-        [SerializeField][Range(0,10)] private int _evaluationDepth = 0;
-
-        [Button]
-        public void End()
-        {
-            OnMate?.Invoke(GameController.OpponentColor);
-        }
-
-        [Button]
-        public void EvaluateCurrentPosition()
-        {
-            Task.Run(() =>
-            {
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                int eval = AIController.EvaluateCurrentPosition(_evaluationDepth, GameController.Ban, out string bestMove);
-                string evalStr = (eval > 0 ? "+" : string.Empty) + eval.ToString();
-                stopwatch.Stop();
-                Debug.Log($"Best Move : " + bestMove + "  |  Evaluation : " + evalStr + "  |  In : " + stopwatch.ElapsedMilliseconds/1000f +"s"); 
-           });
-        }
         
         private void Start()
         {
@@ -205,6 +181,22 @@ namespace YokAI
             spriteRenderer.flipY = !spriteRenderer.flipY;
             
             _pieces[pieceId].ChangeColor(poolColor == PColor.WHITE);
+        }
+
+        public IEnumerator AIMovePiece(uint move, float animTime)
+        {
+            float time = 0;
+            YGrid.GetCoordinates(TargetCell.Get(move), out int x, out int y);
+            
+            while ( time < animTime)
+            {
+                _pieces[MovingPiece.Get(move)].transform.position = Vector3.Lerp(_pieces[MovingPiece.Get(move)].OriginalPosition, new Vector3(x,y,0), time/animTime);
+                 time += Time.deltaTime;
+                 yield return new WaitForEndOfFrame();
+            }
+
+            _pieces[MovingPiece.Get(move)].OriginalPosition = new Vector3(x, y, 0);
+            MakeMoveOnTheBoard(move);
         }
     }
 }

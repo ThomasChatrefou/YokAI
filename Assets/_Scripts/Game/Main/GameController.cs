@@ -15,7 +15,7 @@ namespace YokAI.Main
         public static int MoveNumber { get { return _moveNumber; } }
         public static uint LastMove { get; private set; }
 
-        public static bool IsGenerationDirty { get; private set; }
+        public static bool IsGenerationDirty { get; set; } //temporary public set, waiting for copy of ban for AI
         public static uint[] AvailableMoves
         {
             get
