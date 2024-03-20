@@ -1,6 +1,7 @@
 using YokAI.Main;
 using YokAI.Properties;
 using YokAI.Notation;
+using YokAI.AI;
 
 namespace YokAI.Debugging
 {
@@ -42,6 +43,7 @@ namespace YokAI.Debugging
             {
                 if (BoardManager.IsValid)
                 {
+                    BoardManager.Instance.AIMovePiece(GameController.LastMove, 0.2f);
                     BoardManager.Instance.MakeMoveOnTheBoard(GameController.LastMove);
                 }
                 return true;
@@ -70,6 +72,19 @@ namespace YokAI.Debugging
         public static void PassTurn()
         {
             GameController.PassTurn();
+        }
+        
+        public static void TakeBack()
+        {
+            if (GameController.IsGameSet)
+            {
+                GameController.TakeBack();
+                if (BoardManager.IsValid)
+                {
+                    BoardManager.Instance.AIMovePiece(GameController.LastMove, 0.2f);
+                    BoardManager.Instance.MakeMoveOnTheBoard(GameController.LastMove);
+                }
+            }
         }
 
         public static void LoadPosition(string sfen)
@@ -103,6 +118,17 @@ namespace YokAI.Debugging
                 BoardManager.Instance.ResetBoard();
                 BoardManager.Instance.SetupBoard();
             }
+        }
+
+
+        // AI Tab
+        public static string GiveMeAName()
+        {
+            if (AIManager.IsValid)
+            {
+                return AIManager.Instance.playerOne.Evaluator.NbPositionReached.ToString();
+            }
+            return Symbol.INVALID.ToString();
         }
     }
 }

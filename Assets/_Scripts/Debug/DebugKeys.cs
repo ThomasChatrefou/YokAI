@@ -18,13 +18,14 @@ namespace YokAI.Debugging
         public const string LOAD_POSITION = "Load Position";
 
         // AI Tab
-        public const string NB_POSITION_REACHED = "nb positions reached";
+        public const string NB_POSITION_REACHED = "nb positions reached :";
     }
 
     public static class Buttons
     {
         public const string VALIDATE = "Validate";
-        public const string PASS_TURN = "Pass Turn"; //unused
+        public const string PASS_TURN = "Pass Turn";
+        public const string TAKE_BACK = "Take Back";
         public const string LOAD_SFEN = "Load SFEN";
         public const string SAVE_SFEN = "Save SFEN";
         public const string EMPTY_POSITION = "Empty position";

@@ -68,10 +68,11 @@ namespace YokAI.Debugging
             GUILayout.Label(Labels.NEXT_MOVE, EditorStyles.whiteLargeLabel);
 
             GUILayout.BeginHorizontal();
-            float width = EditorUtility.GetUniformWidthFromWindow(_window.position.width, 3);
+            float width = EditorUtility.GetUniformWidthFromWindow(_window.position.width, 4);
             _userInputNotation = EditorGUILayout.TextArea(_userInputNotation, GUILayout.Width(width));
             bool doValidate = GUILayout.Button(Buttons.VALIDATE, GUILayout.Width(width));
             bool doPass = GUILayout.Button(Buttons.PASS_TURN, GUILayout.Width(width));
+            bool doTakeBack = GUILayout.Button(Buttons.TAKE_BACK, GUILayout.Width(width));
             GUILayout.EndHorizontal();
 
             if (doValidate)
@@ -81,6 +82,10 @@ namespace YokAI.Debugging
             if (doPass)
             {
                 YokAIDebugger.PassTurn();
+            }
+            if (doTakeBack)
+            {
+                YokAIDebugger.TakeBack();
             }
         }
 

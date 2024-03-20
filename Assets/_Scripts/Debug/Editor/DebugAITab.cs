@@ -10,11 +10,11 @@ namespace YokAI.Debugging
         {
             GUILayout.Label(TabNames.AI, EditorStyles.whiteLargeLabel);
 
-            float width = 120f;
+            float width = 150f;
 
             GUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(Labels.NB_POSITION_REACHED, GUILayout.Width(width));
-            EditorGUILayout.LabelField(AIManager.Instance.playerOne.Evaluator.NbPositionReached.ToString());
+            EditorGUILayout.LabelField(YokAIDebugger.GiveMeAName());
             GUILayout.EndHorizontal();
 
             GUILayout.FlexibleSpace();
