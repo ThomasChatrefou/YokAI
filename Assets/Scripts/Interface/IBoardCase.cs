@@ -18,5 +18,12 @@ namespace YokaiNoMori.Interface
         /// </summary>
         /// <returns></returns>
         public IPawn GetPawnOnIt();
+
+
+        /// <summary>
+        /// Check if the board case is busy
+        /// </summary>
+        /// <returns>true if is busy</returns>
+        public bool IsBusy();
     }
 }
