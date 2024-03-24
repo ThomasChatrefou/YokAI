@@ -43,6 +43,6 @@ namespace YokAI.Debugging
     {
         public const string WHITE = "White"; // Sente in Shogi
         public const string BLACK = "Black"; // Gote in Shogi (but I am a Chess player...)
-        public const string UNKNOWN = "Unknown"; // Gote in Shogi (but I am a Chess player...)
+        public const string UNKNOWN = "Unknown";
     }
 }

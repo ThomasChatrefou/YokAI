@@ -32,7 +32,7 @@ namespace YokAI.Debugging
         {
             if (GameController.IsGameSet && GameController.LastMove != Move.INVALID)
             {
-                return Decryptor.GetNotationFromMove(GameController.LastMove, GameController.Ban);
+                return Decryptor.GetNotationFromMove(GameController.LastMove, ref GameController.GetBan());
             }
             return Symbol.INVALID.ToString();
         }
@@ -43,7 +43,7 @@ namespace YokAI.Debugging
             {
                 if (BoardManager.IsValid)
                 {
-                    BoardManager.Instance.AIMovePiece(GameController.LastMove, 0.2f);
+                    BoardManager.Instance.AIMovePiece(GameController.LastMove);
                     BoardManager.Instance.MakeMoveOnTheBoard(GameController.LastMove);
                 }
                 return true;
@@ -61,7 +61,7 @@ namespace YokAI.Debugging
                 for (int i = 0; i < moveCount; ++i)
                 {
                     int lineIndex = i / MAX_MOVES_PER_LINE;
-                    cachedResult[lineIndex] += Decryptor.GetNotationFromMove(GameController.AvailableMoves[i], GameController.Ban);
+                    cachedResult[lineIndex] += Decryptor.GetNotationFromMove(GameController.AvailableMoves[i], ref GameController.GetBan());
                     cachedResult[lineIndex] += MOVE_SEPARATOR;
                 }
                 return;
@@ -81,7 +81,7 @@ namespace YokAI.Debugging
                 GameController.TakeBack();
                 if (BoardManager.IsValid)
                 {
-                    BoardManager.Instance.AIMovePiece(GameController.LastMove, 0.2f);
+                    BoardManager.Instance.AIMovePiece(GameController.LastMove);
                     BoardManager.Instance.MakeMoveOnTheBoard(GameController.LastMove);
                 }
             }
@@ -89,14 +89,13 @@ namespace YokAI.Debugging
 
         public static void LoadPosition(string sfen)
         {
-            GameController.StartingPositionSFEN = sfen;
-            GameController.SetupStartingPosition();
+            GameController.SetupPosition(sfen);
             TrySetupBoard();
         }
 
         public static void RestartPosition()
         {
-            GameController.SetupStartingPosition();
+            GameController.ResetPosition();
             TrySetupBoard();
         }
         
@@ -107,7 +106,7 @@ namespace YokAI.Debugging
 
         public static void EmptyPosition()
         {
-            GameController.EmptyPosition();
+            GameController.Clear();
             TrySetupBoard();
         }
 

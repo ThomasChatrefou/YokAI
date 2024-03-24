@@ -11,16 +11,15 @@ namespace YokAI.AI
 
         public AIController(EvaluationParamSO evaluationParamSo)
         {
-
             _evaluator = new FirstEvaluator(evaluationParamSo);
-
         }
 
-        public int EvaluateCurrentPosition(int depth, YokAIBan ban, out string bestMoveNotation)
+        public int EvaluateCurrentPosition(int depth, ref YokAIBan const_ban, out string bestMoveNotation)
         {
             _evaluator.NbPositionReached = 0;
-            int eval = _evaluator.Search(depth, ref ban);
-            bestMoveNotation = Decryptor.GetNotationFromMove(_evaluator.BestMove, ban);
+            YokAIBan banCopy = const_ban;
+            int eval = _evaluator.Search(depth, ref banCopy);
+            bestMoveNotation = Decryptor.GetNotationFromMove(_evaluator.BestMove, ref const_ban);
             return eval;
         }
     }

@@ -24,6 +24,8 @@ namespace YokAI
 
         [SerializeField] public UColor WhiteColor;
         [SerializeField] public UColor BlackColor;
+
+        [SerializeField] private float autoPlayPieceAnimDuration = 0.2f;
         
         private Dictionary<byte, PieceController> _pieces = new();
         private Dictionary<(byte, uint), Transform> _pools = new();
@@ -34,13 +36,13 @@ namespace YokAI
         
         private void Start()
         {
-            GameController.SetupYokaiNoMoriPosition();
+            GameController.SetupYokaiNoMori();
             SetupBoard();
         }
 
         private void OnDisable()
         {
-            GameController.Reset();
+            GameController.Clear();
         }
 
         public void ResetBoard()
@@ -62,12 +64,12 @@ namespace YokAI
 
         private void CreatePieces()
         {
-            PieceSet pieceSet = GameController.Ban.PieceSet;
-            for (byte pieceId = 0; pieceId < GameController.Ban.PieceSet.Size; pieceId++)
+            for (byte pieceId = 0; pieceId < GameController.PieceSetSize; pieceId++)
             {
-                uint pieceType = Type.Get(pieceSet[pieceId]);
-                uint pieceColor = PColor.Get(pieceSet[pieceId]);
-                GameObject go = (PColor.Get(pieceSet[pieceId]) == PColor.WHITE) ? whitePiecesBank[pieceType - 1] : blackPiecesBank[pieceType - 1];
+                uint currentPiece = GameController.GetPiece(pieceId);
+                uint pieceType = Type.Get(currentPiece);
+                uint pieceColor = PColor.Get(currentPiece);
+                GameObject go = (pieceColor == PColor.WHITE) ? whitePiecesBank[pieceType - 1] : blackPiecesBank[pieceType - 1];
                 PieceController pieceController = Instantiate(go, Vector3.up * 10, quaternion.identity, transform).GetComponent<PieceController>();
                 pieceController.PieceID = pieceId;
                 pieceController.ChangeColor(pieceColor == PColor.WHITE);
@@ -77,14 +79,13 @@ namespace YokAI
 
         private void DefinePiecesPositionInPools()
         {
-            PieceSet pieceSet = GameController.Ban.PieceSet;
-            for (byte pieceId = 0; pieceId < GameController.Ban.PieceSet.Size; pieceId++)
+            for (byte pieceId = 0; pieceId < GameController.PieceSetSize; pieceId++)
             {
-                uint pieceType = Type.Get(pieceSet[pieceId]);
-                uint pieceColor = PColor.Get(pieceSet[pieceId]);
+                uint currentPiece = GameController.GetPiece(pieceId);
+                uint pieceType = Type.Get(currentPiece);
+                uint pieceColor = PColor.Get(currentPiece);
                 if (pieceType == Type.PAWN || pieceType == Type.BISHOP || pieceType == Type.ROOK)
                 {
-
                     _pools[(pieceId, PColor.WHITE)] = poolPositions[(pieceType - 1) * 2 + pieceColor - 1];
                     _pools[(pieceId, PColor.BLACK)] = poolPositions[(pieceType - 1) * 2 + pieceColor - 1 + 6];
                 }
@@ -93,9 +94,9 @@ namespace YokAI
         
         private void InitBoard()
         {
-            for (byte pieceId = 0; pieceId < GameController.Ban.PieceSet.Size; pieceId++)
+            for (byte pieceId = 0; pieceId < GameController.PieceSetSize; pieceId++)
             {
-                byte cellId = Location.Get(GameController.Ban.PieceSet[pieceId]);
+                byte cellId = Location.Get(GameController.GetPiece(pieceId));
                 YGrid.GetCoordinates(cellId, out int x, out int y);
                 MovePieceOnBoard(pieceId, new Vector2Int(x, y));
             }
@@ -129,6 +130,7 @@ namespace YokAI
             {
                 _pieces[movingPieceId].ChangePromotionPawn(true);
             }
+
             if (Unpromote.Get(inputMove))
             {
                 _pieces[capturedPieceId].ChangePromotionPawn(false);
@@ -136,11 +138,18 @@ namespace YokAI
 
             if (capturedPieceId != PieceSet.INVALID_PIECE_ID)
             {
-                AddPieceToPool(capturedPieceId, PColor.Get(GameController.Ban.PieceSet[capturedPieceId]));
+                AddPieceToPool(capturedPieceId, PColor.Get(GameController.GetPiece(capturedPieceId)));
             }
 
-            _pieces[GameController.KingIds[GameController.PlayingColor - 1]].SetCheckPiece(GameController.IsInCheck);
-            _pieces[GameController.KingIds[GameController.OpponentColor - 1]].SetCheckPiece(false);
+            if (GameController.TryGetKing(GameController.PlayingColor, out byte playingKingId))
+            {
+                _pieces[playingKingId].SetCheckPiece(GameController.IsInCheck);
+            }
+
+            if (GameController.TryGetKing(GameController.OpponentColor, out byte opponentKingId))
+            {
+                _pieces[opponentKingId].SetCheckPiece(false);
+            }
 
             if (GameController.IsMate)
             {
@@ -183,19 +192,23 @@ namespace YokAI
             _pieces[pieceId].ChangeColor(poolColor == PColor.WHITE);
         }
 
-        public void AIMovePiece(uint move, float animTime)
+        public void AIMovePiece(uint move)
         {
-            StartCoroutine(AIMovePiece_Coroutine(move, animTime));
+            StartCoroutine(AIMovePiece_Coroutine(move));
         }
         
-        private IEnumerator AIMovePiece_Coroutine(uint move, float animTime)
+        private IEnumerator AIMovePiece_Coroutine(uint move)
         {
             float time = 0;
             YGrid.GetCoordinates(TargetCell.Get(move), out int x, out int y);
             
-            while ( time < animTime)
+            while (time < autoPlayPieceAnimDuration)
             {
-                _pieces[MovingPiece.Get(move)].transform.position = Vector3.Lerp(_pieces[MovingPiece.Get(move)].OriginalPosition, new Vector3(x,y,0), time/animTime);
+                Vector3 start = _pieces[MovingPiece.Get(move)].OriginalPosition;
+                Vector3 end = new (x, y, 0);
+                float completion = time / autoPlayPieceAnimDuration;
+
+                _pieces[MovingPiece.Get(move)].transform.position = Vector3.Lerp(start, end, completion);
                  time += Time.deltaTime;
                  yield return new WaitForEndOfFrame();
             }

@@ -13,10 +13,8 @@ namespace YokAI.Notation
         public const string SFEN_SEPARATOR = " ";
         public const string RANK_SEPARATOR = "/";
 
-        public static void LoadPositionFromSFEN(ref YokAIBan ban, ref int moveNumber, string sfen)
+        public static void LoadPositionFromSFEN(ref YokAIBan trans_ban, ref int moveNumber, string sfen)
         {
-            ban.Clear();
-
             string[] splitedSfen = sfen.Split(SFEN_SEPARATOR);
 
             string banStr = splitedSfen[0];
@@ -73,9 +71,9 @@ namespace YokAI.Notation
 
             uint[] piecesArray = new uint[piecesList.Count];
             piecesList.CopyTo(piecesArray);
-            PieceSet newPieceSet = new(piecesArray);
 
-            ban.Setup(newPieceSet, playingColor);
+            trans_ban = YokAIBan.Create(piecesArray.Length);
+            trans_ban.Setup(piecesArray, playingColor);
 
             moveNumber = int.Parse(moveNumberStr);
         }

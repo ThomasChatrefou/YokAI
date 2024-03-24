@@ -71,14 +71,14 @@ namespace YokAI.Notation
             return result;
         }
 
-        public static string GetNotationFromMove(uint move, YokAIBan currentBan)
+        public static string GetNotationFromMove(uint move, ref YokAIBan const_ban)
         {
             Move.Unpack(move
                 , out byte movingPieceId, out byte capturedPieceId, out byte startCellId, out byte targetCellId
                 , out bool isDrop, out bool hasPromoted, out bool hasUnpromoted);
 
-            uint movingPiece = currentBan.PieceSet[movingPieceId];
-            uint capturedPiece = currentBan.PieceSet[capturedPieceId];
+            uint movingPiece = const_ban.PieceSet[movingPieceId];
+            uint capturedPiece = const_ban.PieceSet[capturedPieceId];
             char movingPieceSymbol = GetSymbolFromPiece(movingPiece);
 
             Grid.GetCoordinates(startCellId, out int startCellFile, out int startCellRank);

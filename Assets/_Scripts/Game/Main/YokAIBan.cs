@@ -2,45 +2,52 @@ using YokAI.Properties;
 
 namespace YokAI.Main
 {
-    public class YokAIBan
+    public struct YokAIBan
     {
         public const byte MAX_AVAILABLE_MOVES = 64;
 
         public PieceSet PieceSet { get; private set; }
         public Grid Grid { get; private set; }
         public uint PlayingColor { get; private set; }
-        public uint OpponentColor { get { return Color.GetOpponent(PlayingColor); } }
-        public byte[] KingIds { get { return _kingIds; } }
 
-        private uint[] _occupationBitboards;
-        private uint[] _generatedMoves;
-        private int _generatedMovesCount;
+        public uint OpponentColor => Color.GetOpponent(PlayingColor);
 
-        private byte[] _kingIds;
-
-        public YokAIBan()
+        public YokAIBan Copy()
         {
-            Grid = new Grid();
-            _generatedMoves = new uint[MAX_AVAILABLE_MOVES];
-            Clear();
+            YokAIBan newBan = new()
+            {
+                PieceSet = PieceSet.Copy(),
+                Grid = Grid.Copy(),
+                PlayingColor = PlayingColor,
+                _occupationBitboards = new uint[] { 0, 0 },
+                _generatedMoves = new uint[MAX_AVAILABLE_MOVES],
+                _generatedMovesCount = 0,
+                _kingIds = new byte[] { PieceSet.INVALID_PIECE_ID, PieceSet.INVALID_PIECE_ID },
+            };
+            _occupationBitboards.CopyTo(newBan._occupationBitboards, 0);
+            _kingIds.CopyTo(newBan._kingIds, 0);
+            return newBan;
         }
 
-        public void Clear()
+        public static YokAIBan Create(int pieceSetSize)
         {
-            PieceSet = new PieceSet(new uint[0]);
-            Grid.Empty();
-            PlayingColor = Color.NONE;
-
-            _occupationBitboards = new uint[] { 0, 0 };
-            _generatedMovesCount = 0;
-            _kingIds = new byte[2] { PieceSet.INVALID_PIECE_ID, PieceSet.INVALID_PIECE_ID };
+            return new()
+            {
+                PieceSet = PieceSet.Create(pieceSetSize),
+                Grid = Grid.Create(),
+                PlayingColor = Color.NONE,
+                _occupationBitboards = new uint[] { 0, 0 },
+                _generatedMoves = new uint[MAX_AVAILABLE_MOVES],
+                _generatedMovesCount = 0,
+                _kingIds = new byte[] { PieceSet.INVALID_PIECE_ID, PieceSet.INVALID_PIECE_ID },
+            };
         }
 
-        public void Setup(PieceSet pieceSet, uint playingColor)
+        public void Setup(uint[] pieceSet, uint playingColor)
         {
-            PieceSet = pieceSet;
             for (byte pieceId = 0; pieceId < PieceSet.Size; ++pieceId)
             {
+                PieceSet.GetRef(pieceId) = pieceSet[pieceId];
                 uint currentPiece = PieceSet[pieceId];
                 byte cellId = Location.Get(currentPiece);
                 uint color = Color.Get(currentPiece);
@@ -56,21 +63,57 @@ namespace YokAI.Main
             _generatedMovesCount = 0;
         }
 
+        #region Data Access
+
+        public uint[] GetLastMoveGeneration()
+        {
+            uint[] result = new uint[_generatedMovesCount];
+            System.Array.Copy(_generatedMoves, result, _generatedMovesCount);
+            return result;
+        }
+
         public bool IsInCheck(out bool isMultiple)
         {
-            byte kingId = _kingIds[PlayingColor - 1];
-            byte kingCellId = Location.Get(PieceSet[kingId]);
-            byte checkingPieceId = Control.Get(Grid[kingCellId], OpponentColor);
-            isMultiple = checkingPieceId == Control.MULTIPLE;
-            return checkingPieceId != Control.NONE;
+            if (TryGetKing(PlayingColor, out byte kingId))
+            {
+                byte kingCellId = Location.Get(PieceSet[kingId]);
+                byte checkingPieceId = Control.Get(Grid[kingCellId], OpponentColor);
+                isMultiple = checkingPieceId == Control.MULTIPLE;
+                return checkingPieceId != Control.NONE;
+            }
+            isMultiple = false;
+            return false;
         }
 
         public bool IsOpponentKingOnPromotionZone()
         {
-            byte opponentKingId = _kingIds[OpponentColor - 1];
-            byte kingCellId = Location.Get(PieceSet[opponentKingId]);
-            return PromotionZone.Get(kingCellId) == OpponentColor;
+            if (TryGetKing(OpponentColor, out byte opponentKingId))
+            {
+                byte kingCellId = Location.Get(PieceSet[opponentKingId]);
+                return PromotionZone.Get(kingCellId) == OpponentColor;
+            }
+            return false;
         }
+
+        public bool TryGetKing(uint color, out byte kingId)
+        {
+            if (_kingIds.Length >= color && color != Color.NONE)
+            {
+                kingId = GetKing(color);
+                return true;
+            }
+            kingId = PieceSet.INVALID_PIECE_ID;
+            return false;
+        }
+
+        private byte GetKing(uint color)
+        {
+            return _kingIds[color - 1];
+        }
+
+        #endregion Data Access
+
+        #region Move Generation
 
         public void GenerateMoves()
         {
@@ -78,7 +121,7 @@ namespace YokAI.Main
 
             if (IsInCheck(out bool isMultiple))
             {
-                byte kingId = _kingIds[PlayingColor - 1];
+                byte kingId = GetKing(PlayingColor);
                 GeneratePieceMoves(ref kingId, ref PieceSet.GetRef(kingId));
 
                 if (isMultiple) return;
@@ -98,7 +141,7 @@ namespace YokAI.Main
 
                     if (Bitboard.Contains(reachableCells, checkingPieceCellId))
                     {
-                        GeneratePieceMove(pieceId, startCellId, checkingPieceCellId, mobility);
+                        CreateMove(pieceId, startCellId, checkingPieceCellId, mobility);
                     }
                 }
             }
@@ -114,8 +157,8 @@ namespace YokAI.Main
                 }
             }
         }
-
-        public void GeneratePieceMoves(ref byte pieceId, ref uint movingPiece)
+        
+        private void GeneratePieceMoves(ref byte pieceId, ref uint movingPiece)
         {
             ComputePieceReachableCells(out byte startCellId, out uint mobility, out uint reachableCells, ref movingPiece, PlayingColor);
 
@@ -126,12 +169,12 @@ namespace YokAI.Main
                     if (Type.Get(movingPiece) == Type.CHAD && Control.Get(Grid[targetCellId], OpponentColor) != Control.NONE)
                         continue;
 
-                    GeneratePieceMove(pieceId, startCellId, targetCellId, mobility);
+                    CreateMove(pieceId, startCellId, targetCellId, mobility);
                 }
             }
         }
-
-        public void ComputePieceReachableCells(out byte startCellId, out uint mobility, out uint reachableCells, ref uint movingPiece, uint currentColor, bool useOccupation = true, bool noDrop = false)
+        
+        private void ComputePieceReachableCells(out byte startCellId, out uint mobility, out uint reachableCells, ref uint movingPiece, uint currentColor, bool useOccupation = true, bool noDrop = false)
         {
             startCellId = Location.Get(movingPiece);
             mobility = Mobility.Get(movingPiece);
@@ -159,8 +202,8 @@ namespace YokAI.Main
                 Bitboard.AlignBackWithGrid(ref reachableCells, startCellId);
             }
         }
-
-        public void GeneratePieceMove(byte movingPieceId, byte startCellId, byte targetCellId, uint mobility)
+        
+        private void CreateMove(byte movingPieceId, byte startCellId, byte targetCellId, uint mobility)
         {
             byte capturedPieceId = Occupation.Get(Grid[targetCellId]);
             uint move = Move.Create(movingPieceId, capturedPieceId, startCellId, targetCellId
@@ -171,39 +214,9 @@ namespace YokAI.Main
             _generatedMoves[_generatedMovesCount++] = move;
         }
 
-        public void UpdateControl()
-        {
-            for (byte targetCellId = 0; targetCellId < Grid.SIZE; ++targetCellId)
-            {
-                Control.Set(ref Grid.GetCellRef(targetCellId), Control.NONE, PlayingColor);
-                Control.Set(ref Grid.GetCellRef(targetCellId), Control.NONE, OpponentColor);
-            }
+        #endregion Move Generation
 
-            for (byte pieceId = 0; pieceId < PieceSet.Size; pieceId++)
-            {
-                uint currentPiece = PieceSet[pieceId];
-                uint currentColor = Color.Get(currentPiece);
-
-                ComputePieceReachableCells(out byte _, out uint _, out uint reachableCells, ref currentPiece, currentColor, useOccupation: false, noDrop: true);
-
-                for (byte targetCellId = 0; targetCellId < Grid.SIZE; ++targetCellId)
-                {
-                    byte controllingPieceId = Control.Get(Grid[targetCellId], currentColor);
-
-                    if (Bitboard.Contains(reachableCells, targetCellId))
-                    {
-                        if (controllingPieceId == Control.NONE)
-                        {
-                            Control.Set(ref Grid.GetCellRef(targetCellId), pieceId, currentColor);
-                        }
-                        else if (controllingPieceId != Control.MULTIPLE)
-                        {
-                            Control.Set(ref Grid.GetCellRef(targetCellId), Control.MULTIPLE, currentColor);
-                        }
-                    }
-                }
-            }
-        }
+        #region Move Making
 
         public void MakeMove(uint move)
         {
@@ -238,7 +251,7 @@ namespace YokAI.Main
             UpdateControl();
             Pass();
         }
-
+        
         public void UnmakeMove(uint move)
         {
             Move.Unpack(move
@@ -276,113 +289,52 @@ namespace YokAI.Main
 
             UpdateControl();
         }
-
+        
         public void Pass()
         {
             PlayingColor = Color.GetOpponent(PlayingColor);
         }
-
-        public uint[] GetLastMoveGeneration()
+        
+        private void UpdateControl()
         {
-            uint[] result = new uint[_generatedMovesCount];
-            System.Array.Copy(_generatedMoves, result, _generatedMovesCount);
-            return result;
-        }
-    }
-
-    public class Grid
-    {
-        public const byte INVALID_CELL_ID = Location.NONE;
-
-        public const byte FILES = 3;
-        public const byte RANKS = 4;
-        public const byte SIZE = FILES * RANKS;
-
-        public uint[] Cells { get; private set; }
-
-        public Grid()
-        {
-            Cells = new uint[SIZE];
-        }
-
-        public void Empty()
-        {
-            for (int i = 0; i < SIZE; ++i)
+            for (byte targetCellId = 0; targetCellId < Grid.SIZE; ++targetCellId)
             {
-                Cells[i] = Cell.EMPTY;
+                Control.Set(ref Grid.GetCellRef(targetCellId), Control.NONE, PlayingColor);
+                Control.Set(ref Grid.GetCellRef(targetCellId), Control.NONE, OpponentColor);
+            }
+
+            for (byte pieceId = 0; pieceId < PieceSet.Size; pieceId++)
+            {
+                uint currentPiece = PieceSet[pieceId];
+                uint currentColor = Color.Get(currentPiece);
+
+                ComputePieceReachableCells(out byte _, out uint _, out uint reachableCells, ref currentPiece, currentColor, useOccupation: false, noDrop: true);
+
+                for (byte targetCellId = 0; targetCellId < Grid.SIZE; ++targetCellId)
+                {
+                    byte controllingPieceId = Control.Get(Grid[targetCellId], currentColor);
+
+                    if (Bitboard.Contains(reachableCells, targetCellId))
+                    {
+                        if (controllingPieceId == Control.NONE)
+                        {
+                            Control.Set(ref Grid.GetCellRef(targetCellId), pieceId, currentColor);
+                        }
+                        else if (controllingPieceId != Control.MULTIPLE)
+                        {
+                            Control.Set(ref Grid.GetCellRef(targetCellId), Control.MULTIPLE, currentColor);
+                        }
+                    }
+                }
             }
         }
 
-        public uint this[byte cellId]
-        {
-            get
-            {
-                if (cellId == INVALID_CELL_ID) return Cell.INVALID;
-                return Cells[cellId];
-            }
-            set
-            {
-                Cells[cellId] = value;
-            }
-        }
+        #endregion Move Making
 
-        public ref uint GetCellRef(byte cellId)
-        {
-            if (cellId == INVALID_CELL_ID) return ref _invalidCell;
-            return ref Cells[cellId];
-        }
-
-        public static byte GetCellId(int x, int y)
-        {
-            return (byte)(y * FILES + x);
-        }
-
-        public static void GetCoordinates(byte cellId, out int x, out int y)
-        {
-            x = cellId % FILES;
-            y = cellId / FILES;
-        }
-
-        private static uint _invalidCell;
-    }
-
-    public struct PieceSet
-    {
-        public const byte INVALID_PIECE_ID = Occupation.NONE;
-        public const byte MAX_PIECES_COUNT = Grid.SIZE;
-
-        public uint[] Pieces { get; private set; }
-        public int Size => Pieces.Length;
-
-        public PieceSet(uint[] pieces)
-        {
-            Pieces = new uint[System.Math.Min(pieces.Length, MAX_PIECES_COUNT)];
-            for (int i = 0; i < Pieces.Length; ++i)
-            {
-                Pieces[i] = pieces[i];
-            }
-        }
-
-        public uint this[byte pieceId]
-        {
-            get
-            {
-                if (pieceId == INVALID_PIECE_ID) return Piece.INVALID;
-                return Pieces[pieceId];
-            }
-            set
-            {
-                Pieces[pieceId] = value;
-            }
-        }
-
-        public ref uint GetRef(byte pieceId)
-        {
-            if (pieceId == INVALID_PIECE_ID) return ref _invalidPiece;
-            return ref Pieces[pieceId];
-        }
-
-        private static uint _invalidPiece;
+        private uint[] _occupationBitboards;
+        private uint[] _generatedMoves;
+        private int _generatedMovesCount;
+        private byte[] _kingIds;
     }
 }
 

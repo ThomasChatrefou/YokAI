@@ -67,7 +67,9 @@ namespace YokAI.AI
             await Task.Run(async () =>
             {
                 player.Evaluator.NbPositionReached = 0;
-                var searchTask = Task.Run(() => player.Evaluator.Search(_maxEvaluationDepth, ref GameController.Ban));
+                YokAIBan simulationBan = GameController.GetBanCopy();
+
+                var searchTask = Task.Run(() => player.Evaluator.Search(_maxEvaluationDepth, ref simulationBan));
 
                 await Task.Delay(maxThinkTime);
                 
@@ -75,13 +77,13 @@ namespace YokAI.AI
                 
                 await searchTask;
                 
-                GameController.IsGenerationDirty = true;
                 uint bestMove = player.Evaluator.BestMove;
+                Debug.Log("Best Move found is : " + Decryptor.GetNotationFromMove(bestMove, ref GameController.GetBan()));
+                
                 GameController.TryMakeMove(bestMove);
-                Debug.Log("Best Move found is : " + Decryptor.GetNotationFromMove(bestMove, GameController.Ban));
             });
 
-            BoardManager.Instance.AIMovePiece(player.Evaluator.BestMove, .2f);
+            BoardManager.Instance.AIMovePiece(player.Evaluator.BestMove);
         }
     }
 }
