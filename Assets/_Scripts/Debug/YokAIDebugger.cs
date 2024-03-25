@@ -125,7 +125,7 @@ namespace YokAI.Debugging
         {
             if (AIManager.IsValid)
             {
-                return AIManager.Instance.playerOne.Evaluator.NbPositionReached.ToString();
+                //return AIManager.Instance.playerOne.Evaluator.NbPositionReached.ToString();
             }
             return Symbol.INVALID.ToString();
         }

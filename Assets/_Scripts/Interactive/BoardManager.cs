@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Unity.Mathematics;
 using UnityEngine;
 using YokAI.Main;
@@ -33,7 +32,15 @@ namespace YokAI
         public UColor IndicatorColor => indicatorColor;
 
         public event System.Action<uint> OnMate;
-        
+
+        public delegate void AutoMoveHandle();
+        public event AutoMoveHandle OnAutoMoveMade;
+
+        public delegate void DisableHandle();
+        public event DisableHandle OnDisabled;
+
+        public bool IsReady = true;
+
         private void Start()
         {
             GameController.SetupYokaiNoMori();
@@ -43,6 +50,7 @@ namespace YokAI
         private void OnDisable()
         {
             GameController.Clear();
+            OnDisabled?.Invoke();
         }
 
         public void ResetBoard()
@@ -194,6 +202,7 @@ namespace YokAI
 
         public void AIMovePiece(uint move)
         {
+            IsReady = false;
             StartCoroutine(AIMovePiece_Coroutine(move));
         }
         
@@ -215,6 +224,8 @@ namespace YokAI
 
             _pieces[MovingPiece.Get(move)].OriginalPosition = new Vector3(x, y, 0);
             MakeMoveOnTheBoard(move);
+            IsReady = true;
+            OnAutoMoveMade?.Invoke();
         }
     }
 }

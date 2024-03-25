@@ -32,6 +32,9 @@ namespace YokAI.Main
             }
         }
 
+        public delegate void MakeMoveHandle();
+        public static event MakeMoveHandle OnMoveMade;
+
         static GameController()
         {
             Clear();
@@ -116,6 +119,7 @@ namespace YokAI.Main
             _ban.UnmakeMove(LastMove);
             _moveNumber--;
             _isDirty = true;
+            OnMoveMade?.Invoke();
         }
 
         public static void PassTurn()
@@ -123,6 +127,7 @@ namespace YokAI.Main
             _ban.Pass();
             _moveNumber++;
             _isDirty = true;
+            OnMoveMade?.Invoke();
         }
 
         private static bool IsValid(uint userMove)
@@ -157,6 +162,7 @@ namespace YokAI.Main
             LastMove = userMove;
             _moveNumber++;
             _isDirty = true;
+            OnMoveMade?.Invoke();
         }
 
         #endregion Move Making
