@@ -481,13 +481,13 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc6fdf698640bcd4e881aa3e1f75d103, type: 3}
---- !u!4 &4221047899119658224
+--- !u!4 &1152811747364684483
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8374596402602801012}
+  m_GameObject: {fileID: 8300962942867945948}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -496,7 +496,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8374596402602801012
+--- !u!114 &2514613518228045027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8300962942867945948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 517c41927e2a4311b4f3f551f1202926, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _defaultEvaluationParamSo: {fileID: 11400000, guid: b82043c89ab59974a9cdf3841c96cf5f, type: 2}
+  _playMode: {fileID: 0}
+  _maxEvaluationDepth: 7
+  _maxThinkTime: 1000
+  IsAISet: 0
+--- !u!1 &8300962942867945948
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -504,8 +521,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4221047899119658224}
-  - component: {fileID: 8560352590478635320}
+  - component: {fileID: 1152811747364684483}
+  - component: {fileID: 2514613518228045027}
   m_Layer: 0
   m_Name: AIManager
   m_TagString: Untagged
@@ -513,22 +530,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &8560352590478635320
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8374596402602801012}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 517c41927e2a4311b4f3f551f1202926, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _defaultEvaluationParamSo: {fileID: 11400000, guid: b82043c89ab59974a9cdf3841c96cf5f, type: 2}
-  _playMode: {fileID: 11400000, guid: 0774d061aa8212143b283b190df3e081, type: 2}
-  _maxEvaluationDepth: 7
-  _maxThinkTime: 1000
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -537,4 +538,4 @@ SceneRoots:
   - {fileID: 1703412218}
   - {fileID: 574044129}
   - {fileID: 783379473}
-  - {fileID: 4221047899119658224}
+  - {fileID: 1152811747364684483}

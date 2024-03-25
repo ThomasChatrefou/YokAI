@@ -24,6 +24,8 @@ namespace YokAI.AI
         private AIController _playerOne;
         private AIController _playerTwo;
 
+        public bool IsAISet;
+
         [Button]
         public void MakeMove()
         {
@@ -38,11 +40,18 @@ namespace YokAI.AI
 
         private void Start()
         {
+            if (_playMode == null)
+            {
+                IsAISet = false;
+                return;
+            }
+
             _playMode.Setup(ref _playerOne, ref _playerTwo);
             if (_playerOne != null)
             {
                 PlayAI(_playerOne);
             }
+            IsAISet = true;
         }
 
         private void OnEnable()
@@ -61,16 +70,16 @@ namespace YokAI.AI
         
         private void OnMoveMade()
         {
-            if (BoardManager.Instance.IsReady)
+            if (!IsAISet) return;
+            if (!BoardManager.Instance.IsReady) return;
+
+            if (GameController.PlayingColor == Properties.Color.WHITE && _playerOne != null)
             {
-                if (GameController.PlayingColor == Properties.Color.WHITE && _playerOne != null)
-                {
-                    PlayAI(_playerOne);
-                }
-                if (GameController.PlayingColor == Properties.Color.BLACK && _playerTwo != null)
-                {
-                    PlayAI(_playerTwo);
-                }
+                PlayAI(_playerOne);
+            }
+            if (GameController.PlayingColor == Properties.Color.BLACK && _playerTwo != null)
+            {
+                PlayAI(_playerTwo);
             }
         }
 
