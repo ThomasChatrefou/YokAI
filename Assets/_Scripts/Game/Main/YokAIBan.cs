@@ -270,7 +270,7 @@ namespace YokAI.Main
 
             Location.Set(ref movingPiece, startCellId);
             Type.Set(ref movingPiece, hasPromoted ? Type.PAWN : Type.Get(movingPiece));
-            Mobility.Set(ref movingPiece, isDrop ? Mobility.DROP : Mobility.Get(movingPiece));
+            Mobility.Set(ref movingPiece, isDrop ? Mobility.DROP : MobilityByPiece.Get(Color.Get(movingPiece), Type.Get(movingPiece)));
 
             Bitboard.Move(ref playerOccupationBitboard, startCellId, targetCellId);
 

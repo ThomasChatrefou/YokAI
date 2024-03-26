@@ -43,7 +43,7 @@ namespace YokAI.Debugging
             {
                 if (BoardManager.IsValid)
                 {
-                    BoardManager.Instance.AIMovePiece(GameController.LastMove);
+                    BoardManager.Instance.AutoMovePiece(GameController.LastMove);
                     BoardManager.Instance.MakeMoveOnTheBoard(GameController.LastMove);
                 }
                 return true;
@@ -76,13 +76,13 @@ namespace YokAI.Debugging
         
         public static void TakeBack()
         {
-            if (GameController.IsGameSet)
+            if (GameController.IsGameSet && GameController.LastMove != Move.INVALID)
             {
+                uint lastMove = GameController.LastMove;
                 GameController.TakeBack();
                 if (BoardManager.IsValid)
                 {
-                    BoardManager.Instance.AIMovePiece(GameController.LastMove);
-                    BoardManager.Instance.MakeMoveOnTheBoard(GameController.LastMove);
+                    BoardManager.Instance.TakeBack(lastMove);
                 }
             }
         }

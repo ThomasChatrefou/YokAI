@@ -7,7 +7,7 @@ using YColor = YokAI.Properties.Color;
 
 namespace YokAI.UnitTests
 {
-    [CreateAssetMenu(menuName = "Test/PositionLoader", fileName = "Test_PositionLoader")]
+    [CreateAssetMenu(menuName = "ScriptableObjects/UnitTests/PositionLoader", fileName = "Test_PositionLoader")]
     public class PositionLoaderTest : ScriptableObject
     {
         [Button]

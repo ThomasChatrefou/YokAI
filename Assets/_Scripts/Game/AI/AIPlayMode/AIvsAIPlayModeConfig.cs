@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace YokAI.AI
 {
-    [CreateAssetMenu(fileName = "AIvsAIPlayModeConfig", menuName = "AIPlayMode/AIvsAI", order = 2)]
+    [CreateAssetMenu(fileName = "AIvsAIPlayModeConfig", menuName = "ScriptableObjects/AIPlayMode/AIvsAI", order = 2)]
     public class AIvsAIPlayModeConfig : AIPlayModeConfig
     {
         [SerializeField][BoxGroup("Evaluators")] private EvaluationParamSO _opponentEvaluationParamSo;

@@ -89,12 +89,15 @@ namespace YokAI.Notation
 
             string notation = string.Empty;
 
-            notation += movingPieceSymbol;
             if (hasPromoted)
             {
-                notation += Symbol.PROMOTION;
-                notation += Color.Get(movingPiece) == Color.WHITE ? char.ToUpper(Symbol.GOLD) : Symbol.GOLD;
+                notation += Color.Get(movingPiece) == Color.WHITE ? char.ToUpper(Symbol.PAWN) : Symbol.PAWN;
             }
+            else
+            {
+                notation += movingPieceSymbol;
+            }
+
             if (!UseReducedNotation && startCellId != Grid.INVALID_CELL_ID)
             {
                 notation += startCellFileAscii;
@@ -124,6 +127,12 @@ namespace YokAI.Notation
             }
             notation += targetCellFileAscii;
             notation += (targetCellRank + 1).ToString();
+
+            if (hasPromoted)
+            {
+                notation += Symbol.PROMOTION;
+                notation += Color.Get(movingPiece) == Color.WHITE ? char.ToUpper(Symbol.GOLD) : Symbol.GOLD;
+            }
 
             return notation;
         }

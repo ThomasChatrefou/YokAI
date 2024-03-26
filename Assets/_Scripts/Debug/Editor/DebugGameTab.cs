@@ -6,49 +6,53 @@ namespace YokAI.Debugging
 {
     public class DebugGameTab : DebuggerTab
     {
-        public const float SPACE_BETWEEN_PARTS = 10f;
+        private float _sectionsInterspace = DefaultDebugWindowSettings.SECTIONS_INTERSPACE;
+        private float _staticLabelWidth = DefaultDebugWindowSettings.LABEL_WIDTH;
 
         public override void Open()
         {
             //GUILayout.Label(TabNames.GAME, EditorStyles.whiteLargeLabel);
-            GUILayout.Space(SPACE_BETWEEN_PARTS);
 
-            PrintGameInformation();
-            GUILayout.Space(SPACE_BETWEEN_PARTS);
+            DisplaySection_GameInformation();
+            GUILayout.Space(_sectionsInterspace);
 
-            HandleMoveMaking();
-            GUILayout.Space(SPACE_BETWEEN_PARTS);
+            DisplaySection_MoveMaker();
+            GUILayout.Space(_sectionsInterspace);
 
-            HandlePositionLoading();
+            DisplaySection_PositionLoader();
 
             GUILayout.FlexibleSpace();
-            HandleFooter();
+            DisplayFooter();
         }
 
-        public void PrintGameInformation()
+        public override void OnRefresh(bool hasSettings)
+        {
+            _sectionsInterspace = hasSettings ? _window.Settings.GameTabSectionsInterspace : DefaultDebugWindowSettings.SECTIONS_INTERSPACE;
+            _staticLabelWidth = hasSettings ? _window.Settings.GameTabLabelWidth : DefaultDebugWindowSettings.LABEL_WIDTH;
+        }
+
+        public void DisplaySection_GameInformation()
         {
             GUILayout.Label(Labels.GAME_INFOS, EditorStyles.whiteLargeLabel);
 
-            float width = 120f;
-
             GUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(Labels.PLAYING_COLOR, GUILayout.Width(width));
+            EditorGUILayout.LabelField(Labels.PLAYING_COLOR, GUILayout.Width(_staticLabelWidth));
             EditorGUILayout.LabelField(YokAIDebugger.GetPlayingColor());
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(Labels.MOVE_NUMBER, GUILayout.Width(width));
+            EditorGUILayout.LabelField(Labels.MOVE_NUMBER, GUILayout.Width(_staticLabelWidth));
             EditorGUILayout.LabelField(YokAIDebugger.GetMoveNumber());
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(Labels.LAST_MOVE, GUILayout.Width(width));
+            EditorGUILayout.LabelField(Labels.LAST_MOVE, GUILayout.Width(_staticLabelWidth));
             EditorGUILayout.LabelField(YokAIDebugger.GetLastMove());
             GUILayout.EndHorizontal();
 
             YokAIDebugger.GetAvailableMoves(ref _availableMoves);
             GUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(Labels.AVAILABLE_MOVES, GUILayout.Width(width));
+            EditorGUILayout.LabelField(Labels.AVAILABLE_MOVES, GUILayout.Width(_staticLabelWidth));
             EditorGUILayout.SelectableLabel(_availableMoves[0], GUILayout.Height(GUI.skin.textField.lineHeight));
             GUILayout.EndHorizontal();
             if (_availableMoves.Length > 1)
@@ -56,23 +60,24 @@ namespace YokAI.Debugging
                 for (int i = 1; i < _availableMoves.Length; ++i)
                 {
                     GUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField(string.Empty, GUILayout.Width(width));
+                    EditorGUILayout.LabelField(string.Empty, GUILayout.Width(_staticLabelWidth));
                     EditorGUILayout.SelectableLabel(_availableMoves[i], GUILayout.Height(GUI.skin.textField.lineHeight));
                     GUILayout.EndHorizontal();
                 }
             }
         }
 
-        public void HandleMoveMaking()
+        public void DisplaySection_MoveMaker()
         {
             GUILayout.Label(Labels.NEXT_MOVE, EditorStyles.whiteLargeLabel);
 
+            float dynamicWidth = EditorUtility.GetUniformWidthFromWindow(_window.position.width, 4);
+
             GUILayout.BeginHorizontal();
-            float width = EditorUtility.GetUniformWidthFromWindow(_window.position.width, 4);
-            _userInputNotation = EditorGUILayout.TextArea(_userInputNotation, GUILayout.Width(width));
-            bool doValidate = GUILayout.Button(Buttons.VALIDATE, GUILayout.Width(width));
-            bool doPass = GUILayout.Button(Buttons.PASS_TURN, GUILayout.Width(width));
-            bool doTakeBack = GUILayout.Button(Buttons.TAKE_BACK, GUILayout.Width(width));
+            _userInputNotation = EditorGUILayout.TextArea(_userInputNotation, GUILayout.Width(dynamicWidth));
+            bool doValidate = GUILayout.Button(Buttons.VALIDATE, GUILayout.Width(dynamicWidth));
+            bool doPass = GUILayout.Button(Buttons.PASS_TURN, GUILayout.Width(dynamicWidth));
+            bool doTakeBack = GUILayout.Button(Buttons.TAKE_BACK, GUILayout.Width(dynamicWidth));
             GUILayout.EndHorizontal();
 
             if (doValidate)
@@ -89,18 +94,18 @@ namespace YokAI.Debugging
             }
         }
 
-        public void HandlePositionLoading()
+        public void DisplaySection_PositionLoader()
         {
-            float width = EditorUtility.GetUniformWidthFromWindow(WinWidth, 3);
+            float dynamicWidth = EditorUtility.GetUniformWidthFromWindow(WinWidth, 3);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(Labels.LOAD_POSITION, EditorStyles.whiteLargeLabel);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            _userInputSFEN = EditorGUILayout.TextField(_userInputSFEN, GUILayout.Width(width));
-            bool doLoad = GUILayout.Button(Buttons.LOAD_SFEN, GUILayout.Width(width));
-            bool doSave = GUILayout.Button(Buttons.SAVE_SFEN, GUILayout.Width(width));
+            _userInputSFEN = EditorGUILayout.TextField(_userInputSFEN, GUILayout.Width(dynamicWidth));
+            bool doLoad = GUILayout.Button(Buttons.LOAD_SFEN, GUILayout.Width(dynamicWidth));
+            bool doSave = GUILayout.Button(Buttons.SAVE_SFEN, GUILayout.Width(dynamicWidth));
             GUILayout.EndHorizontal();
 
             bool doEmpty = GUILayout.Button(Buttons.EMPTY_POSITION);
@@ -124,7 +129,7 @@ namespace YokAI.Debugging
             }
         }
 
-        public void HandleFooter()
+        public void DisplayFooter()
         {
         }
 

@@ -115,7 +115,7 @@ namespace YokAI.AI
 
             if (GameController.IsGameSet)
             {
-                BoardManager.Instance.AIMovePiece(player.Evaluator.BestMove);
+                BoardManager.Instance.AutoMovePiece(player.Evaluator.BestMove);
             }
         }
     }

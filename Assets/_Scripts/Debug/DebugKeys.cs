@@ -4,6 +4,7 @@ namespace YokAI.Debugging
     {
         public const string GAME = "Game";
         public const string AI = "AI";
+        public const string UNIT_TESTS = "Unit Tests";
     }
 
     public static class Labels
@@ -23,6 +24,7 @@ namespace YokAI.Debugging
 
     public static class Buttons
     {
+        public const string REFRESH = "Refresh";
         public const string VALIDATE = "Validate";
         public const string PASS_TURN = "Pass Turn";
         public const string TAKE_BACK = "Take Back";

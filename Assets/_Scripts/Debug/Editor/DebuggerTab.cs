@@ -11,6 +11,7 @@ namespace YokAI.Debugging
         }
 
         public abstract void Open();
+        public abstract void OnRefresh(bool hasSettings);
 
         protected DebugWindow _window;
     }

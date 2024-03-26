@@ -117,6 +117,7 @@ namespace YokAI.Main
         public static void TakeBack()
         {
             _ban.UnmakeMove(LastMove);
+            LastMove = Move.INVALID;
             _moveNumber--;
             _isDirty = true;
             OnMoveMade?.Invoke();
@@ -125,6 +126,7 @@ namespace YokAI.Main
         public static void PassTurn()
         {
             _ban.Pass();
+            LastMove = Move.INVALID;
             _moveNumber++;
             _isDirty = true;
             OnMoveMade?.Invoke();

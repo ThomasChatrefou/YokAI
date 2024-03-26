@@ -7,6 +7,7 @@ using YokAI.Properties;
 using UColor = UnityEngine.Color;
 using PColor = YokAI.Properties.Color;
 using YGrid = YokAI.Main.Grid;
+using static UnityEngine.EventSystems.StandaloneInputModule;
 
 
 namespace YokAI
@@ -38,6 +39,8 @@ namespace YokAI
 
         public delegate void DisableHandle();
         public event DisableHandle OnDisabled;
+
+        private delegate void PieceAnimFinishedHandle();
 
         public bool IsReady = true;
 
@@ -199,33 +202,106 @@ namespace YokAI
             
             _pieces[pieceId].ChangeColor(poolColor == PColor.WHITE);
         }
-
-        public void AIMovePiece(uint move)
+        
+        private void UnaddPieceToPool(byte pieceId, uint poolColor, Vector3 previousPos)
         {
-            IsReady = false;
-            StartCoroutine(AIMovePiece_Coroutine(move));
+            Vector3 newPos = previousPos;
+
+            _pieces[pieceId].transform.position = newPos;
+            _pieces[pieceId].OriginalPosition = newPos;
+
+            SpriteRenderer spriteRenderer = _pieces[pieceId].GetComponent<SpriteRenderer>();
+
+            spriteRenderer.flipX = !spriteRenderer.flipX;
+            spriteRenderer.flipY = !spriteRenderer.flipY;
+            
+            _pieces[pieceId].ChangeColor(poolColor == PColor.WHITE);
+        }
+
+        public void AutoMovePiece(uint move)
+        {
+            ReadMove(move, out byte movingPieceId, out Vector3 startCellPos, out Vector3 targetCellPos);
+            StartCoroutine(AutoMovePiece_Coroutine(
+                movingPieceId,
+                startCellPos,
+                targetCellPos,
+                onFinish: () => { MakeMoveOnTheBoard(move); }));
         }
         
-        private IEnumerator AIMovePiece_Coroutine(uint move)
+        private IEnumerator AutoMovePiece_Coroutine(byte pieceId, Vector3 start, Vector3 end, PieceAnimFinishedHandle onFinish)
         {
+            IsReady = false;
             float time = 0;
-            YGrid.GetCoordinates(TargetCell.Get(move), out int x, out int y);
             
             while (time < autoPlayPieceAnimDuration)
             {
-                Vector3 start = _pieces[MovingPiece.Get(move)].OriginalPosition;
-                Vector3 end = new (x, y, 0);
                 float completion = time / autoPlayPieceAnimDuration;
 
-                _pieces[MovingPiece.Get(move)].transform.position = Vector3.Lerp(start, end, completion);
+                _pieces[pieceId].transform.position = Vector3.Lerp(start, end, completion);
                  time += Time.deltaTime;
                  yield return new WaitForEndOfFrame();
             }
 
-            _pieces[MovingPiece.Get(move)].OriginalPosition = new Vector3(x, y, 0);
-            MakeMoveOnTheBoard(move);
+            _pieces[pieceId].OriginalPosition = end;
             IsReady = true;
+            onFinish?.Invoke();
             OnAutoMoveMade?.Invoke();
+        }
+
+        private void ReadMove(uint move, out byte movingPieceId, out Vector3 startCellPos, out Vector3 targetCellPos)
+        {
+            movingPieceId = MovingPiece.Get(move);
+            YGrid.GetCoordinates(StartCell.Get(move), out int startX, out int startY);
+            YGrid.GetCoordinates(TargetCell.Get(move), out int targetX, out int targetY);
+            startCellPos = new(startX, startY, 0);
+            targetCellPos = new(targetX, targetY, 0);
+        }
+
+        public void TakeBack(uint move)
+        {
+            ReadMove(move, out byte movingPieceId, out Vector3 startCellPos, out Vector3 targetCellPos);
+            if (Drop.Get(move))
+            {
+                startCellPos = _pools[(movingPieceId, PColor.Get(GameController.GetPiece(movingPieceId)))].position;
+            }
+
+            StartCoroutine(AutoMovePiece_Coroutine(
+                movingPieceId,
+                targetCellPos,
+                startCellPos,
+                onFinish: () => { TakeBackOnTheBoard(move); }));
+        }
+
+        public void TakeBackOnTheBoard(uint move)
+        {
+            ReadMove(move, out byte movingPieceId, out Vector3 _, out Vector3 targetCellPos);
+
+            byte capturedPieceId = CapturedPiece.Get(move);
+
+            if (capturedPieceId != PieceSet.INVALID_PIECE_ID)
+            {
+                UnaddPieceToPool(capturedPieceId, PColor.Get(GameController.GetPiece(capturedPieceId)), targetCellPos);
+            }
+
+            if (Promote.Get(move))
+            {
+                _pieces[movingPieceId].ChangePromotionPawn(false);
+            }
+
+            if (Unpromote.Get(move))
+            {
+                _pieces[capturedPieceId].ChangePromotionPawn(true);
+            }
+
+            if (GameController.TryGetKing(GameController.PlayingColor, out byte playingKingId))
+            {
+                _pieces[playingKingId].SetCheckPiece(GameController.IsInCheck);
+            }
+
+            if (GameController.TryGetKing(GameController.OpponentColor, out byte opponentKingId))
+            {
+                _pieces[opponentKingId].SetCheckPiece(false);
+            }
         }
     }
 }
