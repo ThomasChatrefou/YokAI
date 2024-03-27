@@ -1,7 +1,10 @@
+using _Scripts.Utilities;
 using NaughtyAttributes;
 using UnityEngine;
+using YokAI.AI;
 using YokAI.Debugging;
 using YokAI.Main;
+using YokAI.Properties;
 using YGrid = YokAI.Main.Grid;
 using YColor = YokAI.Properties.Color;
 
@@ -46,6 +49,44 @@ namespace YokAI.UnitTests
 
             Debug.Log($"Main : " + mainBanPlayingColor);
             Debug.Log($"Copy : " + copyPlayingColor);
+        }
+
+        [Button]
+        public void TestSorting()
+        {
+            uint[] array = new uint[] {2,5,3,8,9,1,0};
+            
+            debugArray(array);
+            //array.SortMoves(MoveComparator.CompareMove);
+            Debug.Log("Sort");
+            debugArray(array);
+
+        }
+        
+        static void debugArray(uint[] arr)
+        {
+            var str = "";
+            
+            int n = arr.Length;
+            for (int i = 0; i < n; ++i)
+            {
+                str += arr[i] + "; ";
+            }
+            Debug.Log(str);
+        }
+
+        [Button]
+        public void TestMoves()
+        {
+            uint[] moves = {Move.Create(0, 15, 0,0,false, false, false),
+                            Move.Create(0, 15, 0,0,true, false, false),
+                            Move.Create(1, 15, 0,0,false, true, false),
+                            Move.Create(0, 3, 0,0,false, false, false)};
+
+            debugArray(moves);
+            //moves.SortMoves(MoveComparator.CompareMove);
+            debugArray(moves);
+            
         }
     }
 }

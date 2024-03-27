@@ -9,6 +9,7 @@ namespace YokAI.AI
         public static int BISHOP = 200;
         public static int ROOK = 200;
         public static int GOLD = 300;
+        public static int KING = 400;
 
         static PieceEvaluation()
         {

@@ -123,9 +123,12 @@ namespace YokAI.Debugging
         // AI Tab
         public static string GiveMeAName()
         {
+            //TODO : this is temporary, yuk code
+            var temp = AIManager.Instance;
+            //end of yuk code
             if (AIManager.IsValid)
             {
-                //return AIManager.Instance.playerOne.Evaluator.NbPositionReached.ToString();
+                return AIManager.nbReachedPos.ToString();
             }
             return Symbol.INVALID.ToString();
         }
