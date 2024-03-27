@@ -509,7 +509,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _defaultEvaluationParamSo: {fileID: 11400000, guid: b82043c89ab59974a9cdf3841c96cf5f, type: 2}
-  _playMode: {fileID: 11400000, guid: 0fd4d4ac6f7203540ad9ad735abf2317, type: 2}
+  _playMode: {fileID: 0}
   _maxEvaluationDepth: 7
   _maxThinkTime: 1000
   IsAISet: 0

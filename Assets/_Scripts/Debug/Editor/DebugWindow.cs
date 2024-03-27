@@ -22,7 +22,7 @@ namespace YokAI.Debugging
             {
                 DebuggerTab.Create<DebugGameTab>(this),
                 DebuggerTab.Create<DebugAITab>(this),
-                DebuggerTab.Create<DebugAITab>(this),
+                DebuggerTab.Create<UnitTestTab>(this),
             };
             Refresh();
         }

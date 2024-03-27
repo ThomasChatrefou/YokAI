@@ -85,6 +85,7 @@ namespace YokAI.AI
 
         private async void PlayAI(AIController player)
         {
+            // [TEMP] We should notify the board about our intentions and not directly modifying its state !
             if (GameController.IsGameSet)
             {
                 BoardManager.Instance.IsReady = false;
