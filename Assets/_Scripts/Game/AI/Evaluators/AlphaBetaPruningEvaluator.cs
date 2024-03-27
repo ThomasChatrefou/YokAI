@@ -55,7 +55,7 @@ namespace YokAI.AI
                     break;
                 }
                 
-                if (score > alpha){ 
+                if (score >= alpha){ //TODO : remove equals and everything breaks
                     currentBestMove = move;
                 }
                 
