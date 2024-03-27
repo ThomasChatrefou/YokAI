@@ -6,7 +6,6 @@ using UnityEngine;
 using YokAI.Main;
 using YokAI.Notation;
 using Debug = UnityEngine.Debug;
-using Random = UnityEngine.Random;
 
 namespace YokAI.AI
 {
@@ -24,7 +23,7 @@ namespace YokAI.AI
         private AIController _playerOne;
         private AIController _playerTwo;
 
-        public bool IsAISet;
+        [HideInInspector] public bool IsAISet;
 
         [Button]
         public void MakeMove()
