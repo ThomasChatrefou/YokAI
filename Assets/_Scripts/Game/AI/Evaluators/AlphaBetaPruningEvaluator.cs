@@ -1,7 +1,10 @@
+using System;
+using _Scripts.Utilities;
 using UnityEngine;
 using YokAI.Main;
 using YokAI.Properties;
 using Color = YokAI.Properties.Color;
+using Type = YokAI.Properties.Type;
 
 namespace YokAI.AI
 {
@@ -28,6 +31,8 @@ namespace YokAI.AI
             uint currentBestMove = Move.INVALID;
 
             uint[] availableMoves = ban.GetLastMoveGeneration();
+            
+            availableMoves.SortMoves(MoveComparator.CompareMove);
             
             if (availableMoves.Length == 0)
             {
