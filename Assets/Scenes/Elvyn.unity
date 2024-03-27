@@ -305,12 +305,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 517c41927e2a4311b4f3f551f1202926, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AIvsAI: 0
-  whiteEvaluationParamSo: {fileID: 11400000, guid: b82043c89ab59974a9cdf3841c96cf5f, type: 2}
-  blackEvaluationParamSo: {fileID: 0}
-  _maxEvaluationDepth: 10
-  maxThinkTime: 2000
-  isAIStart: 1
+  _defaultEvaluationParamSo: {fileID: 11400000, guid: b82043c89ab59974a9cdf3841c96cf5f, type: 2}
+  _playMode: {fileID: 11400000, guid: 0fd4d4ac6f7203540ad9ad735abf2317, type: 2}
+  _maxEvaluationDepth: 4
+  _maxThinkTime: 1000
+  IsAISet: 0
 --- !u!4 &1731704428
 Transform:
   m_ObjectHideFlags: 0

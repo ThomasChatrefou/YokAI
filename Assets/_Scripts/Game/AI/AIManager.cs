@@ -12,6 +12,8 @@ namespace YokAI.AI
 {
     public class AIManager : Singleton<AIManager>
     {
+        public static uint nbReachedPos;
+        
         [SerializeField] private EvaluationParamSO _defaultEvaluationParamSo;
         [SerializeField] private AIPlayModeConfig _playMode;
 
@@ -23,6 +25,8 @@ namespace YokAI.AI
         private AIController _defaultAI;
         private AIController _playerOne;
         private AIController _playerTwo;
+
+        public const int maxEvalValue = int.MaxValue;
 
         [HideInInspector] public bool IsAISet;
 
@@ -85,6 +89,8 @@ namespace YokAI.AI
 
         private async void PlayAI(AIController player)
         {
+            player.Evaluator.CanRun = true;
+            
             if (GameController.IsGameSet)
             {
                 BoardManager.Instance.IsReady = false;
@@ -93,9 +99,12 @@ namespace YokAI.AI
             await Task.Run(async () =>
             {
                 player.Evaluator.NbPositionReached = 0;
+                //TODO : this is temporary, yuk code
+                nbReachedPos = 0;
+                //end of yuk code
                 YokAIBan simulationBan = GameController.GetBanCopy();
 
-                var searchTask = Task.Run(() => player.Evaluator.Search(_maxEvaluationDepth, ref simulationBan));
+                var searchTask = Task.Run(() => player.Evaluator.Search(_maxEvaluationDepth, ref simulationBan, -maxEvalValue, maxEvalValue));
 
                 await Task.Delay(_maxThinkTime);
                 

@@ -1,57 +1,68 @@
+using UnityEngine;
 using YokAI.Main;
 using YokAI.Properties;
+using Color = YokAI.Properties.Color;
 
 namespace YokAI.AI
 {
-    public class FirstEvaluator : Evaluator
+    public class AlphaBetaPruningEvaluator : Evaluator
     {
-        public FirstEvaluator(EvaluationParamSO evaluationParamSo)
+        public AlphaBetaPruningEvaluator(EvaluationParamSO evaluationParamSo)
         {
             _evaluationParamSo = evaluationParamSo;
         }
 
-        public override int Search(int depth, ref YokAIBan ban)
+        public override int Search(int depth, ref YokAIBan ban, int alpha, int beta)
         {
             ++NbPositionReached;
+            //TODO : this is temporary, yuk code
+            ++AIManager.nbReachedPos;
+            //end of yuk code
             if (depth == 0)
             {
                 return Evaluate(ref ban);
             }
 
             ban.GenerateMoves();
-
-            int max = int.MinValue;
+            
             uint currentBestMove = Move.INVALID;
 
             uint[] availableMoves = ban.GetLastMoveGeneration();
-
+            
             if (availableMoves.Length == 0)
             {
                 BestMove = currentBestMove;
                 if (ban.IsInCheck(out bool _))
                 {
-                    return int.MinValue;
+                    return -AIManager.maxEvalValue;
                 }
                 return 0;
             }
-
+            
             foreach (uint move in availableMoves)
             {
                 ban.MakeMove(move);
-                int score = -Search(depth - 1, ref ban);
-                if (score > max)
+                int score = -Search(depth - 1, ref ban, -alpha, -beta);
+                ban.UnmakeMove(move);
+
+                if (score > beta)
                 {
-                    max = score;
+                    break;
+                }
+                
+                if (score > alpha){ 
                     currentBestMove = move;
                 }
-
-                ban.UnmakeMove(move);
+                
+                alpha = Mathf.Max(alpha, score);
+                
+                
                 if (!CanRun)
                     break;
             }
 
             BestMove = currentBestMove;
-            return max;
+            return alpha;
         }
 
         protected override int Evaluate(ref YokAIBan ban)

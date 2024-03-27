@@ -11,7 +11,7 @@ namespace YokAI.AI
         public bool CanRun { get; set; } = true;
 
         protected EvaluationParamSO _evaluationParamSo;
-        public virtual int Search(int depth, ref YokAIBan ban)
+        public virtual int Search(int depth, ref YokAIBan ban, int alpha, int beta)
         {
             return 0;
         }
