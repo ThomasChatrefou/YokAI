@@ -5,12 +5,12 @@ namespace YokAI.AI
 {
     public static class MoveComparator
     {
-        public static bool CompareMove(uint firstMove, uint secondMove)
+        public static bool CompareMove(uint firstMove, uint secondMove, YokAIBan ban)
         {
-            return MoveScore(firstMove) < MoveScore(secondMove);
+            return MoveScore(firstMove, ban) < MoveScore(secondMove, ban);
         }
 
-        private static int MoveScore(uint move)
+        private static int MoveScore(uint move, YokAIBan ban)
         {
             int score = 0;
             
@@ -20,21 +20,41 @@ namespace YokAI.AI
 
             if (hasPromoted)
             {
-                score += 20;
+                score += 200;
             }
 
             if (isDrop)
             {
-                score += 10;
+                score += 100;
             }
 
-            if (capturedPieceId != PieceSet.INVALID_PIECE_ID) // TODO : Evaluate Capture
+            if (capturedPieceId != PieceSet.INVALID_PIECE_ID)
             {
-                score += 30;
+                score += 300 + 4 * GetPieceValue(capturedPieceId, ban) - GetPieceValue(movingPieceId, ban);
             }
 
+            byte controllingPieceId = Control.Get(ban.Grid[targetCellId], ban.OpponentColor);
+            
+            switch (controllingPieceId)
+            {
+                case Control.NONE:
+                    score += 50;
+                    break;
+                case Control.MULTIPLE:
+                    score -= 50;
+                    break;
+            }
 
             return score;
+        }
+
+        private static int GetPieceValue(byte pieceId, YokAIBan ban)
+        {
+            uint piece = ban.PieceSet[pieceId];
+            uint pieceType = Type.Get(piece);
+            int pieceValue = PieceEvaluation.Get(pieceType);
+
+            return pieceValue;
         }
     }
 }

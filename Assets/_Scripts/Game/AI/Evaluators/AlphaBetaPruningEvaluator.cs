@@ -32,7 +32,7 @@ namespace YokAI.AI
 
             uint[] availableMoves = ban.GetLastMoveGeneration();
             
-            availableMoves.SortMoves(MoveComparator.CompareMove);
+            availableMoves.SortMoves(MoveComparator.CompareMove, ban);
             
             if (availableMoves.Length == 0)
             {

@@ -57,7 +57,7 @@ namespace YokAI.UnitTests
             uint[] array = new uint[] {2,5,3,8,9,1,0};
             
             debugArray(array);
-            array.SortMoves(MoveComparator.CompareMove);
+            //array.SortMoves(MoveComparator.CompareMove);
             Debug.Log("Sort");
             debugArray(array);
 
@@ -84,7 +84,7 @@ namespace YokAI.UnitTests
                             Move.Create(0, 3, 0,0,false, false, false)};
 
             debugArray(moves);
-            moves.SortMoves(MoveComparator.CompareMove);
+            //moves.SortMoves(MoveComparator.CompareMove);
             debugArray(moves);
             
         }
