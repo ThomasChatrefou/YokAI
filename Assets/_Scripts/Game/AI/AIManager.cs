@@ -5,6 +5,7 @@ using NaughtyAttributes;
 using UnityEngine;
 using YokAI.Main;
 using YokAI.Notation;
+using YokAI.Properties;
 using Debug = UnityEngine.Debug;
 
 namespace YokAI.AI
@@ -106,15 +107,25 @@ namespace YokAI.AI
                 if (GameController.IsGameSet)
                 {
                     uint bestMove = player.Evaluator.BestMove;
-                    Debug.Log("Best Move found is : " + Decryptor.GetNotationFromMove(bestMove, ref GameController.GetBan()));
-                
-                    GameController.TryMakeMove(bestMove);
+                    if (bestMove != Move.INVALID)
+                    {
+                        Debug.Log("Best Move found is : " + Decryptor.GetNotationFromMove(bestMove, ref GameController.GetBan()));
+                        GameController.TryMakeMove(bestMove);
+                    }
+                    else
+                    {
+                        Debug.Log("No move found !");
+                    }
                 }
             });
 
             if (GameController.IsGameSet)
             {
-                BoardManager.Instance.AutoMovePiece(player.Evaluator.BestMove);
+                uint bestMove = player.Evaluator.BestMove;
+                if (bestMove != Move.INVALID)
+                {
+                    BoardManager.Instance.AutoMovePiece(bestMove);
+                }
             }
         }
     }

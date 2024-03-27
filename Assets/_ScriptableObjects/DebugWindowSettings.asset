@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c81c188f38ec6774b8d09b6a863504a9, type: 3}
   m_Name: DebugWindowSettings
   m_EditorClassIdentifier: 
-  _gameTabLabelWidth: 126
-  _gameTabSectionsInterspace: 23.6
-  _aiTabLabelWidth: 143
+  _gameTabLabelWidth: 121
+  _gameTabSectionsInterspace: 27.3
+  _aiTabLabelWidth: 140

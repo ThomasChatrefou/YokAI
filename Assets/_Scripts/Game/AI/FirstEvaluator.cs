@@ -24,6 +24,17 @@ namespace YokAI.AI
             uint currentBestMove = Move.INVALID;
 
             uint[] availableMoves = ban.GetLastMoveGeneration();
+
+            if (availableMoves.Length == 0)
+            {
+                BestMove = currentBestMove;
+                if (ban.IsInCheck(out bool _))
+                {
+                    return int.MinValue;
+                }
+                return 0;
+            }
+
             foreach (uint move in availableMoves)
             {
                 ban.MakeMove(move);
